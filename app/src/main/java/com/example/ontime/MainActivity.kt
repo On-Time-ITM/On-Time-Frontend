@@ -1,5 +1,6 @@
 package com.example.ontime
 
+import AppBar
 import CustomButton
 import android.os.Bundle
 import android.util.Log
@@ -93,34 +94,7 @@ fun MainPage() {
 }
 
 
-@Composable
-private fun AppBar() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ontime_logo),
-            contentDescription = "App Logo",
-            modifier = Modifier.size(41.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            "OnTime!",
-            fontSize = 20.sp,
-            color = shadow,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            painter = painterResource(id = R.drawable.profile_icon),
-            contentDescription = "Settings",
-            modifier = Modifier.size(28.dp)
-        )
-    }
-}
+
 
 @Composable
 private fun UserStatsCard() {

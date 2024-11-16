@@ -1,8 +1,12 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -14,18 +18,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.ontime.R
 import com.example.ontime.ui.theme.ButtonText
 import com.example.ontime.ui.theme.ErrorColor
 import com.example.ontime.ui.theme.InputBackground
 import com.example.ontime.ui.theme.MainColor
 import com.example.ontime.ui.theme.body_large
+import com.example.ontime.ui.theme.shadow
 
 @Composable
 fun CustomTextField(
@@ -102,5 +112,34 @@ fun CustomButton(
         } else {
             Text(text = text, fontSize = body_large)
         }
+    }
+}
+
+@Composable
+fun AppBar() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp)
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ontime_logo),
+            contentDescription = "App Logo",
+            modifier = Modifier.size(41.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            "OnTime!",
+            fontSize = 20.sp,
+            color = shadow,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Image(
+            painter = painterResource(id = R.drawable.profile_icon),
+            contentDescription = "Settings",
+            modifier = Modifier.size(28.dp)
+        )
     }
 }
