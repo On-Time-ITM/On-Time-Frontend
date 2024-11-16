@@ -1,4 +1,4 @@
-package com.example.ontime
+package com.example.ontime.ui.main
 
 import AppBar
 import CustomButton
@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ontime.R
 import com.example.ontime.ui.theme.MainColor
 import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.body_large

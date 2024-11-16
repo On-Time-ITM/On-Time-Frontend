@@ -1,8 +1,7 @@
-package com.example.ontime
+package com.example.ontime.ui.auth.login
 
 import CustomButton
 import CustomTextField
-import LoginViewModel
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,6 +31,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ontime.R
+import com.example.ontime.ui.auth.signup.SignupActivity
 import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.surfaceContainerLowest
 

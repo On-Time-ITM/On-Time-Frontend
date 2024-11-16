@@ -1,4 +1,4 @@
-package com.example.ontime
+package com.example.ontime.ui.auth.signup
 
 import CustomButton
 import CustomTextField
