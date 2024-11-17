@@ -2,8 +2,9 @@ package com.example.ontime.ui.auth.signup
 
 import CustomButton
 import CustomTextField
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,11 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.ontime.ui.main.MainActivity
 import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.body_medium
 import com.example.ontime.ui.theme.headline_large
@@ -77,7 +80,9 @@ fun SignUp(viewModel: SignupViewModel) {
     // ViewModel의 회원가입 상태를 관찰
     val signupState by viewModel.signupState.collectAsState()
 
-    // 회원가입 상태에 따른 UI 업데이트 처리
+    val context = LocalContext.current
+
+    // 회원가입 상태에 따른 UI 업데이트 처리. useEffect와 비슷한 역할
     LaunchedEffect(signupState) {
         when (signupState) {
             is SignupState.Loading -> {
@@ -86,13 +91,23 @@ fun SignUp(viewModel: SignupViewModel) {
 
             is SignupState.Success -> {
                 isLoading = false  // 로딩 종료
-                // TODO: 회원가입 성공 시 다음 화면으로 이동 처리
+                // MainActivity로 이동하고 현재 액티비티 종료
+                context.startActivity(Intent(context, MainActivity::class.java).apply {
+                    // 백스택 클리어 (뒤로 가기 했을 때 회원가입 화면으로 돌아오지 않도록)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
             }
 
             is SignupState.Error -> {
                 isLoading = false  // 로딩 종료
                 // 에러 발생 시 로그 출력
-                Log.e("SignUp", "Error: ${(signupState as SignupState.Error).message}")
+//                Log.e("SignUp", "Error: ${(signupState as SignupState.Error).message}")
+                // 에러 메시지를 토스트로 표시
+                Toast.makeText(
+                    context,
+                    (signupState as SignupState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             else -> {
