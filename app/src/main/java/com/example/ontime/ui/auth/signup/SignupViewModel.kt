@@ -1,17 +1,25 @@
 package com.example.ontime.ui.auth.signup
 
+import AuthApi
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ontime.data.api.ApiClient
+import com.example.ontime.data.auth.AuthManager
 import com.example.ontime.data.model.request.SignupRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 // SignupViewModel - 회원가입 관련 비즈니스 로직과 상태 관리를 담당
-class SignupViewModel : ViewModel() {
+
+@HiltViewModel
+class SignupViewModel @Inject constructor(
+    private val authApi: AuthApi,
+    private val authManager: AuthManager
+) : ViewModel() {
     // 회원가입 진행 상태를 저장하는 StateFlow
     private val _signupState = MutableStateFlow<SignupState>(SignupState.Initial)
     val signupState: StateFlow<SignupState> = _signupState.asStateFlow()
@@ -26,11 +34,17 @@ class SignupViewModel : ViewModel() {
                 // API 요청 객체 생성
                 val request = SignupRequest(name, phoneNumber, password)
                 // 회원가입 API 호출
-                val response = ApiClient.authApi.signup(request)
+                val response = authApi.signup(request)
 
                 // 응답 처리
                 if (response.isSuccessful) {
                     _signupState.value = SignupState.Success
+//                    response.body()?.let { signupResponse ->
+//                        AuthManager.
+//                    }
+                    Log.d("ITM", "Status Code: ${response.code()}")
+                    Log.d("ITM", "Headers: ${response.headers()}")
+                    Log.d("ITM", "Body: ${response.body()}")
                 } else {
                     _signupState.value = SignupState.Error("Signup failed")
                     Log.d("ITM", "fail")
