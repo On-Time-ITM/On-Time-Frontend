@@ -5,5 +5,6 @@ package com.example.ontime.data.model.response
 data class SignupResponse(
     val accessToken: String,
     val refreshToken: String,
-    // 기타 필요한 사용자 정보
+    val expiresIn: Int,
+    val userId: String
 )
