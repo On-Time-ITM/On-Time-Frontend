@@ -53,26 +53,27 @@ fun CustomTextField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(label) },
-            singleLine = true,
+            label = { Text(label) }, // 텍스트 필드 라벨
+            singleLine = true, // 한 줄 입력만 가능
             colors = TextFieldDefaults.colors(
-                unfocusedContainerColor = InputBackground,
-                focusedContainerColor = InputBackground
+                unfocusedContainerColor = InputBackground, // 비포커스 시 배경색
+                focusedContainerColor = InputBackground // 포커스 시 배경색
             ),
             shape = RoundedCornerShape(15.dp),
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction
+                keyboardType = keyboardType, // 키보드 타입 설정
+                imeAction = imeAction // IME 액션 설정
             ),
             keyboardActions = KeyboardActions(
-                onDone = { onImeAction() }
+                onDone = { onImeAction() } // IME 액션 처리
             ),
-            isError = error != null,
+            isError = error != null, // 에러 여부
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(15.dp))
         )
+        // 에러 메시지 표시
         if (error != null) {
             Text(
                 text = error,
@@ -102,14 +103,16 @@ fun CustomButton(
             containerColor = MainColor,
             contentColor = ButtonText
         ),
-        enabled = enabled && !isLoading
+        enabled = enabled && !isLoading // 로딩 중일 때 버튼 비활성화
     ) {
         if (isLoading) {
+            // 로딩 중일 때 CircularProgressIndicator 표시
             CircularProgressIndicator(
                 color = ButtonText,
                 modifier = Modifier.size(24.dp)
             )
         } else {
+            // 로딩 중이 아닐 때 텍스트 표시
             Text(text = text, fontSize = body_large)
         }
     }
