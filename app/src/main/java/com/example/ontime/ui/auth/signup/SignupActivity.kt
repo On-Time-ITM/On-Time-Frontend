@@ -3,9 +3,11 @@ package com.example.ontime.ui.auth.signup
 import CustomButton
 import CustomTextField
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +39,7 @@ import com.example.ontime.ui.theme.onSurfaceVariant
 import com.example.ontime.ui.theme.surfaceContainerLowest
 
 class SignupActivity : ComponentActivity() {
+    private val viewModel: SignupViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,7 +49,7 @@ class SignupActivity : ComponentActivity() {
                     Surface(
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        SignUp()
+                        SignUp(viewModel = viewModel)
                     }
                 }
             }
@@ -53,18 +58,46 @@ class SignupActivity : ComponentActivity() {
 }
 
 @Composable
-fun SignUp() {
+fun SignUp(viewModel: SignupViewModel) {
+    // 사용자 입력값을 저장할 상태 변수들
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) } // 로딩 상태
 
-    // Error states
+    // 각 입력필드의 에러 상태를 저장할 변수들
     var nameError by remember { mutableStateOf<String?>(null) }
     var phoneError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+
+    // ViewModel의 회원가입 상태를 관찰
+    val signupState by viewModel.signupState.collectAsState()
+
+    // 회원가입 상태에 따른 UI 업데이트 처리
+    LaunchedEffect(signupState) {
+        when (signupState) {
+            is SignupState.Loading -> {
+                isLoading = true  // 로딩 시작
+            }
+
+            is SignupState.Success -> {
+                isLoading = false  // 로딩 종료
+                // TODO: 회원가입 성공 시 다음 화면으로 이동 처리
+            }
+
+            is SignupState.Error -> {
+                isLoading = false  // 로딩 종료
+                // 에러 발생 시 로그 출력
+                Log.e("SignUp", "Error: ${(signupState as SignupState.Error).message}")
+            }
+
+            else -> {
+                isLoading = false
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -155,27 +188,32 @@ fun SignUp() {
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
+        // 회원가입 버튼
         CustomButton(
             text = "Sign Up",
             onClick = {
-                // Validate inputs
+                // 입력값 유효성 검사
                 var hasError = false
 
+                // 이름 필드 검사
                 if (name.isBlank()) {
                     nameError = "Name is required"
                     hasError = true
                 }
 
+                // 전화번호 필드 검사
                 if (phone.isBlank()) {
                     phoneError = "Phone number is required"
                     hasError = true
                 }
 
+                // 비밀번호 필드 검사
                 if (password.isBlank()) {
                     passwordError = "Password is required"
                     hasError = true
                 }
 
+                // 비밀번호 확인 필드 검사
                 if (confirmPassword.isBlank()) {
                     confirmPasswordError = "Please confirm your password"
                     hasError = true
@@ -184,12 +222,13 @@ fun SignUp() {
                     hasError = true
                 }
 
+                // 에러가 없으면 회원가입 API 호출
                 if (!hasError) {
-                    isLoading = true
-                    // Handle signup
+                    viewModel.signup(name, phone, password)
                 }
             },
             isLoading = isLoading,
+            // 모든 필드가 입력되었을 때만 버튼 활성화
             enabled = name.isNotBlank() &&
                     phone.isNotBlank() &&
                     password.isNotBlank() &&
@@ -206,7 +245,7 @@ fun GreetingPreview3() {
             Surface(
                 modifier = Modifier.padding(innerPadding)
             ) {
-                SignUp()
+//                SignUp()
             }
         }
     }
