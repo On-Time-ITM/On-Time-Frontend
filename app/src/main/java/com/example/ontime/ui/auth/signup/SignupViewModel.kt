@@ -38,10 +38,15 @@ class SignupViewModel @Inject constructor(
 
                 // 응답 처리
                 if (response.isSuccessful) {
+                    response.body()?.let { signupResponse ->
+                        authManager.saveAuthInfo(
+                            signupResponse.accessToken,
+                            signupResponse.refreshToken,
+                            signupResponse.expiresIn,
+                            signupResponse.userId
+                        )
+                    }
                     _signupState.value = SignupState.Success
-//                    response.body()?.let { signupResponse ->
-//                        AuthManager.
-//                    }
                     Log.d("ITM", "Status Code: ${response.code()}")
                     Log.d("ITM", "Headers: ${response.headers()}")
                     Log.d("ITM", "Body: ${response.body()}")

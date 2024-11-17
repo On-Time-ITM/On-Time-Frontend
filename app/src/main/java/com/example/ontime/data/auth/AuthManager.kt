@@ -7,14 +7,23 @@ class AuthManager @Inject constructor(
     private val context: Context
 ) {
     //
-//    private val tokenPreferences = context.getSharedPreferences("tokens", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("tokens", Context.MODE_PRIVATE)
+
+    //
 //
-//
-    fun saveTokens(accessToken: String, refreshToken: String) {
-        // SharedPreferences나 EncryptedSharedPreferences 사용
+    fun saveAuthInfo(accessToken: String, refreshToken: String, expiresIn: Int, userId: String) {
+        // SharedPreferences 사용 (웹의 local storage와 비슷)
+        prefs.edit()
+            .putString(KEY_ACCESS_TOKEN, accessToken)
+            .putString(KEY_REFRESH_TOKEN, refreshToken)
+            .putInt(
+                KEY_EXPIRES_IN, expiresIn
+            ).putString(KEY_USER_ID, userId)
+
         return
     }
-//
+
+    //
 //    // API 호출 시 토큰 확인 및 갱신
 //    suspend fun getValidAccessToken(): String {
 //        if (isAccessTokenExpired()) {
@@ -35,4 +44,26 @@ class AuthManager @Inject constructor(
 //            logout()
 //        }
 //    }
+
+    //    토큰 가져오기
+    fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
+
+    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
+
+    fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
+
+    fun getExpiresIn(): Long = prefs.getLong(KEY_EXPIRES_IN, 0)
+
+    // 로그아웃 (토큰 삭제)
+    fun clearAuthInfo() {
+        prefs.edit().clear().apply()
+    }
+
+
+    companion object {
+        private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_EXPIRES_IN = "expires_in"
+        private const val KEY_USER_ID = "user_id"
+    }
 }
