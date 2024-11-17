@@ -1,9 +1,9 @@
 package com.example.ontime.ui.auth.signup
 
-import AuthApi
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ontime.data.api.AuthApi
 import com.example.ontime.data.auth.AuthManager
 import com.example.ontime.data.model.request.SignupRequest
 import dagger.hilt.android.lifecycle.HiltViewModel

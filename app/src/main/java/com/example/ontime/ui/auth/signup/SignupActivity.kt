@@ -37,7 +37,9 @@ import com.example.ontime.ui.theme.headline_large
 import com.example.ontime.ui.theme.onSurface
 import com.example.ontime.ui.theme.onSurfaceVariant
 import com.example.ontime.ui.theme.surfaceContainerLowest
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SignupActivity : ComponentActivity() {
     private val viewModel: SignupViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {

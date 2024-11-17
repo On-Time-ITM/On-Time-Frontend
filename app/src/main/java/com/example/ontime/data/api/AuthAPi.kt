@@ -1,3 +1,5 @@
+package com.example.ontime.data.api
+
 import com.example.ontime.data.model.request.SignupRequest
 import com.example.ontime.data.model.response.SignupResponse
 import retrofit2.Response
