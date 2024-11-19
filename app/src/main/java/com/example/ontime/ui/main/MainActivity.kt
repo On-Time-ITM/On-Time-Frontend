@@ -2,10 +2,13 @@ package com.example.ontime.ui.main
 
 import AppBar
 import CustomButton
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +41,8 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,19 +51,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ontime.R
+import com.example.ontime.ui.auth.login.LoginActivity
+import com.example.ontime.ui.auth.logout.LogoutState
+import com.example.ontime.ui.auth.logout.LogoutViewModel
 import com.example.ontime.ui.theme.MainColor
 import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.body_large
 import com.example.ontime.ui.theme.shadow
 import com.example.ontime.ui.theme.surfaceContainerLowest
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: LogoutViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        enableEdgeToEdge()
@@ -68,7 +80,7 @@ class MainActivity : ComponentActivity() {
                     Surface(
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        MainPage()
+                        MainPage(viewModel)
                     }
                 }
             }
@@ -77,7 +89,33 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainPage() {
+fun MainPage(viewModel: LogoutViewModel) {
+
+    val context = LocalContext.current
+    val logoutState by viewModel.logoutState.collectAsState()
+
+    // 로그아웃 상태 처리
+    LaunchedEffect(logoutState) {
+        when (logoutState) {
+            is LogoutState.Success -> {
+                // 로그인 화면으로 이동
+                context.startActivity(Intent(context, LoginActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
+
+            is LogoutState.Error -> {
+                // 에러 메시지 표시
+                Toast.makeText(
+                    context,
+                    (logoutState as LogoutState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> {}
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,10 +129,14 @@ fun MainPage() {
 
         // Team Section
         TeamSection()
+        CustomButton(
+            text = "Logout",
+            onClick = { viewModel.logout() },
+            isLoading = viewModel.isLoading,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
     }
 }
-
-
 
 
 @Composable
@@ -339,7 +381,7 @@ fun GreetingPreview() {
             Surface(
                 modifier = Modifier.padding(innerPadding)
             ) {
-                MainPage()
+//                MainPage()
             }
         }
     }
