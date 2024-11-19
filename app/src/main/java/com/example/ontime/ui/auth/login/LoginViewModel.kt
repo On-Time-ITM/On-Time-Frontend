@@ -4,8 +4,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.ontime.data.api.AuthApi
+import com.example.ontime.data.auth.AuthManager
+import com.example.ontime.data.model.request.LoginRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val authApi: AuthApi,
+    private val authManager: AuthManager
+) : ViewModel() {
     var phoneNumber by mutableStateOf("")
         private set
 
@@ -31,6 +45,42 @@ class LoginViewModel : ViewModel() {
         passwordError = validatePassword(newValue)
     }
 
+    // 로그인 상태 관리
+    private val _loginState = MutableStateFlow<LoginState>(LoginState.Initial)
+    val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
+
+    private fun login(phoneNumber: String, password: String) {
+        viewModelScope.launch {
+            try {
+                _loginState.value = LoginState.Loading
+                isLoading = true
+
+                val request = LoginRequest(phoneNumber, password)
+                val response = authApi.login(request)
+
+                if (response.isSuccessful) {
+                    response.body()?.let { loginResponse ->
+                        authManager.saveAuthInfo(
+                            loginResponse.accessToken,
+                            loginResponse.refreshToken,
+                            loginResponse.expiresIn,
+                            loginResponse.userId
+                        )
+                    }
+                    _loginState.value = LoginState.Success
+                } else {
+                    _loginState.value = LoginState.Error("Login failed")
+                }
+
+            } catch (e: Exception) {
+                _loginState.value = LoginState.Error(e.message ?: "Unknown error")
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+
     private fun validatePhoneNumber(phone: String): String? {
         return when {
             phone.isEmpty() -> "Phone number is required"
@@ -42,7 +92,7 @@ class LoginViewModel : ViewModel() {
     private fun validatePassword(password: String): String? {
         return when {
             password.isEmpty() -> "Password is required"
-            password.length < 8 -> "Password must be at least 8 characters"
+            password.length < 5 -> "Password must be at least 8 characters"
             else -> null
         }
     }
@@ -51,14 +101,20 @@ class LoginViewModel : ViewModel() {
         val phoneNumberError = validatePhoneNumber(phoneNumber)
         val passwordError = validatePassword(password)
 
+        this.phoneNumberError = phoneNumberError
+        this.passwordError = passwordError
+
         if (phoneNumberError == null && passwordError == null) {
-            isLoading = true
-            // TODO: Implement actual login logic here
-            // loginRepository.login(phoneNumber, password)
-            isLoading = false
-        } else {
-            this.phoneNumberError = phoneNumberError
-            this.passwordError = passwordError
+            login(phoneNumber, password)
         }
     }
+
+
+}
+
+sealed class LoginState {
+    object Initial : LoginState()    // 초기 상태
+    object Loading : LoginState()    // 로딩 중
+    object Success : LoginState()    // 로그인 성공
+    data class Error(val message: String) : LoginState()  // 로그인 실패
 }
