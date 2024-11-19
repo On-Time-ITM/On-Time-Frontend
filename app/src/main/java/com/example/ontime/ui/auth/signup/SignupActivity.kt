@@ -101,7 +101,7 @@ fun SignUp(viewModel: SignupViewModel) {
             is SignupState.Error -> {
                 isLoading = false  // 로딩 종료
                 // 에러 발생 시 로그 출력
-//                Log.e("SignUp", "Error: ${(signupState as SignupState.Error).message}")
+//                Log.d("ITM", "Error: ${(signupState as SignupState.Error).message}")
                 // 에러 메시지를 토스트로 표시
                 Toast.makeText(
                     context,
@@ -241,7 +241,7 @@ fun SignUp(viewModel: SignupViewModel) {
 
                 // 에러가 없으면 회원가입 API 호출
                 if (!hasError) {
-                    viewModel.signup(name, phone, password)
+                    viewModel.signup(name = name, phoneNumber = phone, password = password)
                 }
             },
             isLoading = isLoading,

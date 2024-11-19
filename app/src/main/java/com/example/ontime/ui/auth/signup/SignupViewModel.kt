@@ -25,14 +25,15 @@ class SignupViewModel @Inject constructor(
     val signupState: StateFlow<SignupState> = _signupState.asStateFlow()
 
     // 회원가입 API 호출 함수
-    fun signup(phoneNumber: String, password: String, name: String) {
+    fun signup(name: String, phoneNumber: String, password: String) {
         viewModelScope.launch {
             try {
                 // 로딩 상태로 변경
                 _signupState.value = SignupState.Loading
 
                 // API 요청 객체 생성
-                val request = SignupRequest(name, phoneNumber, password)
+                val request =
+                    SignupRequest(name = name, phoneNumber = phoneNumber, password = password)
                 // 회원가입 API 호출
                 val response = authApi.signup(request)
 
@@ -51,8 +52,10 @@ class SignupViewModel @Inject constructor(
                     Log.d("ITM", "Headers: ${response.headers()}")
                     Log.d("ITM", "Body: ${response.body()}")
                 } else {
+                    val errorBody = response.errorBody()?.string()
                     _signupState.value = SignupState.Error("Signup failed")
-                    Log.d("ITM", "fail")
+                    Log.d("ITM", "Status Code: ${response.code()}")
+//                    Log.d("ITM", "Error Body: $errorBody")
                 }
             } catch (e: Exception) {
                 // 에러 처리
