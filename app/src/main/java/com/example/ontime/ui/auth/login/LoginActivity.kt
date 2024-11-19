@@ -4,6 +4,7 @@ import CustomButton
 import CustomTextField
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,10 +21,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -33,20 +37,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.ontime.R
 import com.example.ontime.ui.auth.signup.SignupActivity
+import com.example.ontime.ui.main.MainActivity
 import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.surfaceContainerLowest
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class LoginActivity : ComponentActivity() {
+    // viewModels() 델리게이트로 주입받기
+    private val loginViewModel: LoginViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val loginViewModel: LoginViewModel by viewModels()
         setContent {
             OnTimeTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Surface(modifier = Modifier.padding(innerPadding)) {
                         LoginScreen(
+                            viewModel = loginViewModel,
                             onSignUpClick = {
                                 // TODO: Navigate to sign up screen
                                 val intent = Intent(this, SignupActivity::class.java)
@@ -63,11 +72,39 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
+    viewModel: LoginViewModel,
     onSignUpClick: () -> Unit = {}
 ) {
-    val viewModel = remember { LoginViewModel() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    val loginState by viewModel.loginState.collectAsState()
+
+
+    val context = LocalContext.current
+// 상태에 따른 처리
+    LaunchedEffect(loginState) {
+        when (loginState) {
+            is LoginState.Success -> {
+                context.startActivity(Intent(context, MainActivity::class.java).apply {
+                    // 백스택 클리어 (뒤로 가기 했을 때 회원가입 화면으로 돌아오지 않도록)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
+
+            is LoginState.Error -> {
+                // 에러 처리
+//                Log.d("ITM", "Error: ${(loginState as LoginState.Error).message}")
+                Toast.makeText(
+                    context,
+                    (loginState as LoginState.Error).message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            else -> {}
+        }
+    }
 
     Column(
         modifier = modifier
@@ -149,11 +186,11 @@ fun GreetingPreview2() {
     OnTimeTheme {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             Surface(modifier = Modifier.padding(innerPadding)) {
-                LoginScreen(
-                    onSignUpClick = {
-                        // TODO: Navigate to sign up screen
-                    }
-                )
+//                LoginScreen(
+//                    onSignUpClick = {
+//                        // TODO: Navigate to sign up screen
+//                    }
+//                )
             }
         }
     }
