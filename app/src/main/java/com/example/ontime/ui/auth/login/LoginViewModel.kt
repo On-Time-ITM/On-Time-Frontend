@@ -1,5 +1,6 @@
 package com.example.ontime.ui.auth.login
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -57,7 +58,7 @@ class LoginViewModel @Inject constructor(
 
                 val request = LoginRequest(phoneNumber, password)
                 val response = authApi.login(request)
-
+                Log.d("ITM", "Request: ${request}") // 실제 전송되는 요청 데이터 확인
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         authManager.saveAuthInfo(
@@ -70,6 +71,9 @@ class LoginViewModel @Inject constructor(
                     _loginState.value = LoginState.Success
                 } else {
                     _loginState.value = LoginState.Error("Login failed")
+                    val errorBody = response.errorBody()?.string()
+                    Log.d("ITM", "Status Code: ${response.code()}")
+                    Log.d("ITM", "Error Body: $errorBody")
                 }
 
             } catch (e: Exception) {

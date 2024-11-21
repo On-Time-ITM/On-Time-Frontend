@@ -24,7 +24,7 @@ class SignupViewModel @Inject constructor(
     private val _signupState = MutableStateFlow<SignupState>(SignupState.Initial)
     val signupState: StateFlow<SignupState> = _signupState.asStateFlow()
 
-    // 회원가입 API 호출 함수
+    // 회원가입 API 호출 함수r
     fun signup(name: String, phoneNumber: String, password: String) {
         viewModelScope.launch {
             try {
@@ -55,7 +55,7 @@ class SignupViewModel @Inject constructor(
                     val errorBody = response.errorBody()?.string()
                     _signupState.value = SignupState.Error("Signup failed")
                     Log.d("ITM", "Status Code: ${response.code()}")
-//                    Log.d("ITM", "Error Body: $errorBody")
+                    Log.d("ITM", "Error Body: $errorBody")
                 }
             } catch (e: Exception) {
                 // 에러 처리

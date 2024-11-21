@@ -4,6 +4,7 @@ import CustomButton
 import CustomTextField
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -94,7 +95,7 @@ fun LoginScreen(
 
             is LoginState.Error -> {
                 // 에러 처리
-//                Log.d("ITM", "Error: ${(loginState as LoginState.Error).message}")
+                Log.d("ITM", "Error: ${(loginState as LoginState.Error).message}")
                 Toast.makeText(
                     context,
                     (loginState as LoginState.Error).message,
