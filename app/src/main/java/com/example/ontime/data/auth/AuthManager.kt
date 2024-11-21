@@ -7,7 +7,7 @@ class AuthManager @Inject constructor(
     private val context: Context
 ) {
     //
-    private val prefs = context.getSharedPreferences("tokens", Context.MODE_PRIVATE)
+    private val prefs = context.getSharedPreferences("authInfo", Context.MODE_PRIVATE)
 
     //
 //
