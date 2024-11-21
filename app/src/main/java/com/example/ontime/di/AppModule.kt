@@ -3,6 +3,7 @@ package com.example.ontime.di
 import android.content.Context
 import com.example.ontime.data.api.ApiClient
 import com.example.ontime.data.api.AuthApi
+import com.example.ontime.data.api.FriendApi
 import com.example.ontime.data.auth.AuthManager
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,13 @@ object AppModule {
     @Singleton
     fun provideApiClient(): ApiClient {
         return ApiClient()
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideFriendApi(apiClient: ApiClient): FriendApi {
+        return apiClient.friendApi
     }
 
     @Provides
