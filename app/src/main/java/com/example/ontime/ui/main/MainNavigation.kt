@@ -14,22 +14,41 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ontime.ui.auth.login.LoginActivity
 import com.example.ontime.ui.auth.logout.LogoutState
 import com.example.ontime.ui.auth.logout.LogoutViewModel
+import com.example.ontime.ui.friend.AddFriendScreen
+import com.example.ontime.ui.friend.AddFriendViewModel
 import com.example.ontime.ui.main.MainScreen
+import com.example.ontime.ui.team.TeamFormationViewModel
 
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
     val context = LocalContext.current
 
+    // ViewModel을 상위 레벨에서 생성하여 화면 간 데이터 공유
+    val teamFormationViewModel: TeamFormationViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
-        startDestination = Screen.Main.route
+//        startDestination = Screen.Main.route
+        startDestination = Screen.AddFriends.route
     ) {
         mainScreen(navController, context)
-//        teamFormationScreen(navController)
-//        friendSelectionScreen(navController)
+//        teamFormationScreen(navController, teamFormationViewModel)
+//        friendSelectionScreen(navController, teamFormationViewModel)
+        addFriendsScreen(navController)
     }
 }
+
+private fun NavGraphBuilder.addFriendsScreen(navController: NavController) {
+    composable(Screen.AddFriends.route) {
+
+        val viewModel: AddFriendViewModel = hiltViewModel()
+        AddFriendScreen(
+            viewModel = viewModel
+        )
+    }
+}
+
 
 private fun NavGraphBuilder.mainScreen(navController: NavController, context: Context) {
     composable(Screen.Main.route) {
@@ -62,28 +81,30 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
         )
     }
 }
-
 //
-//private fun NavGraphBuilder.teamFormationNavigation(
-//    navController: NavController
+//private fun NavGraphBuilder.teamFormationScreen(
+//    navController: NavController,
+//    viewModel: TeamFormationViewModel
 //) {
 //    composable(Screen.TeamFormation.route) {
 //        TeamFormationScreen(
 //            onFriendSelectionClick = {
 //                navController.navigate(Screen.FriendSelection.route)
-//            }
+//            },
+//            viewModel = viewModel
 //        )
 //    }
 //}
 //
-//private fun NavGraphBuilder.friendSelectionNavigation(
-//    navController: NavController
+//private fun NavGraphBuilder.friendSelectionScreen(
+//    navController: NavController,
+//    teamFormationViewModel: TeamFormationViewModel
 //) {
 //    composable(Screen.FriendSelection.route) {
 //        FriendSelectionScreen(
 //            onBackClick = { navController.popBackStack() },
 //            onFriendsSelected = { selectedFriends ->
-//                // 선택된 친구들 데이터를 처리
+//                teamFormationViewModel.updateMembers(selectedFriends)
 //                navController.popBackStack()
 //            }
 //        )
