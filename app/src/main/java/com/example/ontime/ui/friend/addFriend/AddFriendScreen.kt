@@ -1,7 +1,5 @@
-package com.example.ontime.ui.friend
+package com.example.ontime.ui.friend.addFriend
 
-import AppBar
-import CustomButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,6 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.ontime.test.TestViewModel
+import com.example.ontime.ui.component.AppBar
+import com.example.ontime.ui.component.CustomButton
 import com.example.ontime.ui.theme.ButtonText
 import com.example.ontime.ui.theme.MainColor
 import com.example.ontime.ui.theme.OnTimeTheme
