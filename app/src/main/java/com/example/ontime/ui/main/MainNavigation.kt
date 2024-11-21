@@ -14,8 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ontime.ui.auth.login.LoginActivity
 import com.example.ontime.ui.auth.logout.LogoutState
 import com.example.ontime.ui.auth.logout.LogoutViewModel
-import com.example.ontime.ui.friend.AddFriendScreen
-import com.example.ontime.ui.friend.AddFriendViewModel
+import com.example.ontime.ui.friend.addFriend.AddFriendScreen
+import com.example.ontime.ui.friend.addFriend.AddFriendViewModel
+import com.example.ontime.ui.friend.contactList.ContactListScreen
+import com.example.ontime.ui.friend.contactList.ContactListViewModel
 import com.example.ontime.ui.main.MainScreen
 import com.example.ontime.ui.team.TeamFormationViewModel
 
@@ -30,12 +32,21 @@ fun MainNavigation() {
     NavHost(
         navController = navController,
 //        startDestination = Screen.Main.route
-        startDestination = Screen.AddFriends.route
+        startDestination = Screen.Main.route
     ) {
         mainScreen(navController, context)
 //        teamFormationScreen(navController, teamFormationViewModel)
 //        friendSelectionScreen(navController, teamFormationViewModel)
         addFriendsScreen(navController)
+        contactListScreen(navController)
+    }
+}
+
+
+private fun NavGraphBuilder.contactListScreen(navController: NavController) {
+    composable(Screen.ContactList.route) {
+        val viewModel: ContactListViewModel = hiltViewModel()
+        ContactListScreen(viewModel = viewModel, onNavigateBack = { navController.popBackStack() })
     }
 }
 
@@ -72,6 +83,9 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
             onLogout = { viewModel.logout() },
             onAddTeamClick = {
                 navController.navigate(Screen.TeamFormation.route)
+            },
+            onFriendClick = {
+                navController.navigate(Screen.AddFriends.route)
             },
             onTeamClick = { team ->
                 // 팀 상세 화면으로 이동
