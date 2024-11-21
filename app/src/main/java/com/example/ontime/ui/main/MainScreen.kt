@@ -1,8 +1,5 @@
 package com.example.ontime.ui.main
 
-import AppBar
-import CustomButton
-import Team
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ontime.R
 import com.example.ontime.ui.auth.logout.LogoutViewModel
+import com.example.ontime.ui.component.AppBar
+import com.example.ontime.ui.component.CustomButton
 import com.example.ontime.ui.theme.MainColor
 import com.example.ontime.ui.theme.body_large
 import com.example.ontime.ui.theme.shadow
@@ -55,6 +54,7 @@ fun MainScreen(
     onLogout: () -> Unit,
     onAddTeamClick: () -> Unit,
     onTeamClick: (Team) -> Unit,
+    onFriendClick: () -> Unit,
     viewModel: LogoutViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -74,6 +74,12 @@ fun MainScreen(
             onClick = onLogout,
             isLoading = viewModel.isLoading,
             modifier = Modifier.padding(horizontal = 24.dp)
+        )
+        CustomButton(
+            text = "Add Friends",
+            onClick = onFriendClick,
+            isLoading = viewModel.isLoading,
+            modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp)
         )
     }
 }
