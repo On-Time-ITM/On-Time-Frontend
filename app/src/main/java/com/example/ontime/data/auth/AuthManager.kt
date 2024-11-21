@@ -1,6 +1,7 @@
 package com.example.ontime.data.auth
 
 import android.content.Context
+import android.util.Log
 import javax.inject.Inject
 
 class AuthManager @Inject constructor(
@@ -12,6 +13,8 @@ class AuthManager @Inject constructor(
     //
 //
     fun saveAuthInfo(accessToken: String, refreshToken: String, expiresIn: Int, userId: String) {
+        Log.d("ITM", "Saving user ID: $userId")
+
         // SharedPreferences 사용 (웹의 local storage와 비슷)
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, accessToken)
@@ -19,6 +22,9 @@ class AuthManager @Inject constructor(
             .putInt(
                 KEY_EXPIRES_IN, expiresIn
             ).putString(KEY_USER_ID, userId)
+            .apply()
+        val savedUserId = getUserId()
+        Log.d("ITM", "Verified saved user ID: $savedUserId")
 
         return
     }
