@@ -13,7 +13,8 @@ class AddFriendUseCase @Inject constructor(
     suspend fun addFriend(phoneNumber: String): Result<Unit> {
         return try {
             val userId = authManager.getUserId()
-            val request = AddFriendRequest(phoneNumber, userId.toString())
+            val request =
+                AddFriendRequest(requesterId = userId.toString(), receiverPhoneNumber = phoneNumber)
             Log.d("ITM", "Request: $request") // 요청 데이터 로깅
 
             val response = friendApi.addFriend(request)

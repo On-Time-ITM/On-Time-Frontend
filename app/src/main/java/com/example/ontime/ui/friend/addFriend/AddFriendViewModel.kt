@@ -58,7 +58,7 @@ class AddFriendViewModel @Inject constructor(
                 uiState = uiState.copy(isLoading = true)
 
                 // UseCase를 통해 친구 추가 요청
-                val result = addFriendUseCase.addFriend(phoneNumber)
+                val result = addFriendUseCase.addFriend(phoneNumber = phoneNumber)
 
                 if (result.isSuccess) {
                     uiState = uiState.copy(
