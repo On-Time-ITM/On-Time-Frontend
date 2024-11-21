@@ -2,7 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".OnTimeApplication"
         android:allowBackup="true"
@@ -22,13 +24,18 @@
             android:theme="@style/Theme.OnTime" />
         <activity
             android:name=".ui.team.TeamFormationActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_team_formation"
             android:theme="@style/Theme.OnTime" />
         <activity
             android:name=".ui.auth.signup.SignupActivity"
             android:exported="true"
             android:label="@string/title_activity_signup"
+            android:theme="@style/Theme.OnTime" />
+        <activity
+            android:name=".ui.main.InviteFriendsActivity"
+            android:exported="true"
+            android:label="InviteFriendsActivity"
             android:theme="@style/Theme.OnTime" />
         <activity
             android:name=".ui.auth.login.LoginActivity"
@@ -45,6 +52,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.friends.AddFriendActivity"
+            android:exported="true">
+
         </activity>
     </application>
 </manifest>
