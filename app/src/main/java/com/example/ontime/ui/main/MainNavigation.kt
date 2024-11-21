@@ -18,6 +18,8 @@ import com.example.ontime.ui.friend.addFriend.AddFriendScreen
 import com.example.ontime.ui.friend.addFriend.AddFriendViewModel
 import com.example.ontime.ui.friend.contactList.ContactListScreen
 import com.example.ontime.ui.friend.contactList.ContactListViewModel
+import com.example.ontime.ui.friend.friendList.FriendListScreen
+import com.example.ontime.ui.friend.friendList.FriendListViewModel
 import com.example.ontime.ui.main.MainScreen
 import com.example.ontime.ui.team.TeamFormationViewModel
 
@@ -39,9 +41,19 @@ fun MainNavigation() {
 //        friendSelectionScreen(navController, teamFormationViewModel)
         addFriendsScreen(navController)
         contactListScreen(navController)
+        friendsListScreen(navController)
     }
 }
 
+
+private fun NavGraphBuilder.friendsListScreen(navController: NavController) {
+    composable(Screen.FriendsList.route) {
+        val viewModel: FriendListViewModel = hiltViewModel()
+        FriendListScreen(viewModel = viewModel) {
+
+        }
+    }
+}
 
 private fun NavGraphBuilder.contactListScreen(navController: NavController) {
     composable(Screen.ContactList.route) {
@@ -85,7 +97,7 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
                 navController.navigate(Screen.TeamFormation.route)
             },
             onFriendClick = {
-                navController.navigate(Screen.AddFriends.route)
+                navController.navigate(Screen.FriendsList.route)
             },
             onTeamClick = { team ->
                 // 팀 상세 화면으로 이동
