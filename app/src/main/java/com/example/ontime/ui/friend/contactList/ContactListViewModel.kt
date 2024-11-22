@@ -130,4 +130,8 @@ class ContactListViewModel @Inject constructor(
     fun clearError() {
         uiState = uiState.copy(error = null)
     }
+
+    fun clearSuccess() {
+        uiState = uiState.copy(isSuccess = false)
+    }
 }
