@@ -44,6 +44,10 @@ class AddFriendViewModel @Inject constructor(
         uiState = uiState.copy(error = null)
     }
 
+    fun clearSuccess() {
+        uiState = uiState.copy(isSuccess = false)
+    }
+
     fun addFriend(phoneNumber: String) {
         // 전화번호 유효성 검사
         val phoneNumberError = addFriendUseCase.validatePhoneNumber(phoneNumber)
