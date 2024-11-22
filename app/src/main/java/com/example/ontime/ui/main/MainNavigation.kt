@@ -20,6 +20,8 @@ import com.example.ontime.ui.friend.contactList.ContactListScreen
 import com.example.ontime.ui.friend.contactList.ContactListViewModel
 import com.example.ontime.ui.friend.friendList.FriendListScreen
 import com.example.ontime.ui.friend.friendList.FriendListViewModel
+import com.example.ontime.ui.friend.requestAccpet.RequestListScreen
+import com.example.ontime.ui.friend.requestAccpet.RequestListViewModel
 import com.example.ontime.ui.main.MainScreen
 import com.example.ontime.ui.team.TeamFormationViewModel
 
@@ -42,16 +44,28 @@ fun MainNavigation() {
         addFriendsScreen(navController)
         contactListScreen(navController)
         friendsListScreen(navController)
+        requestListScreen(navController)
     }
 }
 
 
+private fun NavGraphBuilder.requestListScreen(navController: NavController) {
+    composable(Screen.RequestList.route) {
+        val viewModel: RequestListViewModel = hiltViewModel()
+        RequestListScreen(viewModel = viewModel) {
+
+        }
+    }
+}
+
 private fun NavGraphBuilder.friendsListScreen(navController: NavController) {
     composable(Screen.FriendsList.route) {
         val viewModel: FriendListViewModel = hiltViewModel()
-        FriendListScreen(viewModel = viewModel) {
-
-        }
+        FriendListScreen(
+            viewModel = viewModel,
+            onNavigateToContactList = { navController.navigate(Screen.ContactList.route) },
+            onNavigateToDirectAdd = { navController.navigate(Screen.AddFriends.route) },
+            onNavigateToRequests = { navController.navigate(Screen.RequestList.route) })
     }
 }
 
@@ -67,7 +81,8 @@ private fun NavGraphBuilder.addFriendsScreen(navController: NavController) {
 
         val viewModel: AddFriendViewModel = hiltViewModel()
         AddFriendScreen(
-            viewModel = viewModel
+            viewModel = viewModel,
+            onNavigateBack = { navController.popBackStack() }
         )
     }
 }
