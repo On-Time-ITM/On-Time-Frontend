@@ -21,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,7 +55,8 @@ import com.example.ontime.ui.theme.surfaceContainerLowest
 @Composable
 fun AddFriendScreen(
     viewModel: AddFriendViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit  // 뒤로가기 네비게이션 추가
 ) {
     var uiState = viewModel.uiState
     var showPhoneNumberDialog by remember { mutableStateOf(false) }
@@ -75,6 +78,7 @@ fun AddFriendScreen(
             // TODO: 성공 메시지 표시
         }
     }
+
 
     Column(
         modifier = modifier
@@ -106,19 +110,37 @@ fun AddFriendScreen(
             Spacer(modifier = modifier.height(100.dp))
         }
     }
-    // 에러 메시지 표시
+
+    // 에러 다이얼로그
     uiState.error?.let { error ->
-        AlertDialog(
-            onDismissRequest = { viewModel.clearError() },
-            title = { Text("Error") },
-            text = { Text(error) },
-            confirmButton = {
-                Button(onClick = { viewModel.clearError() }) {
-                    Text("OK")
-                }
+        val errorMessage = when {
+            error.contains("Invalid request") -> "You cannot send a friend request to yourself"
+            error.contains("User not found") -> "This phone number is not registered in the app"
+            error.contains("Duplicate friend request") -> "You have already sent a friend request or are already friends"
+            else -> "An error occurred. Please try again later"
+        }
+
+        StatusDialog(
+            title = "Notice",
+            message = errorMessage,
+            isSuccess = false,
+            onDismiss = { viewModel.clearError() }
+        )
+    }
+
+    // 성공 다이얼로그
+    if (uiState.isSuccess) {
+        StatusDialog(
+            title = "Success",
+            message = "Friend request sent successfully!",
+            isSuccess = true,
+            onDismiss = {
+                viewModel.clearSuccess()
+                onNavigateBack()
             }
         )
     }
+
     PhoneNumberInputDialog(
         showDialog = showPhoneNumberDialog,
         onDismiss = { showPhoneNumberDialog = false },
@@ -132,6 +154,73 @@ fun AddFriendScreen(
 
 }
 
+@Composable
+private fun StatusDialog(
+    title: String,
+    message: String,
+    isSuccess: Boolean,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
+            .padding(16.dp),
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+            }
+        },
+        text = {
+            Text(
+                text = message,
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MainColor,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(100.dp),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(
+                        text = "OK",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(12.dp)
+    )
+}
 
 @Composable
 private fun PhoneNumberCard(
