@@ -26,9 +26,15 @@ class AddFriendUseCase @Inject constructor(
                 Result.success(Unit)
             } else {
                 val errorBody = response.errorBody()?.string()
+                val errorMessage = when (response.code()) {
+                    400 -> "Invalid request or self-friend request"
+                    404 -> "User not found" // A005
+                    409 -> "Duplicate friend request" // F002
+                    else -> "Unknown error occurred"
+                }
                 Log.d("ITM", "Status Code: ${response.code()}") // 에러 상태 코드 로깅
                 Log.d("ITM", "Error Body: $errorBody") // 에러 응답 로깅
-                Result.failure(Exception("Failed to add friend"))
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Log.e("ITM", "Exception occurred", e) // 예외 로깅
