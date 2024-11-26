@@ -80,4 +80,10 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.navigation.compose)
+
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+//    implementation(libs.kotlinx.serialization.json)
+//    implementation(libs.kotlinx.serialization)
 }
