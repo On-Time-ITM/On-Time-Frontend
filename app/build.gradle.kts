@@ -20,6 +20,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        manifestPlaceholders.put(
+            "MAPS_API_KEY",
+            project.findProperty("MAPS_API_KEY") as String? ?: ""
+        )
+
+
     }
 
     buildTypes {
@@ -84,6 +90,4 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
-//    implementation(libs.kotlinx.serialization.json)
-//    implementation(libs.kotlinx.serialization)
 }
