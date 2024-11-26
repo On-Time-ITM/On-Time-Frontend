@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.ontime.data.api.ApiClient
 import com.example.ontime.data.api.AuthApi
 import com.example.ontime.data.api.FriendApi
+import com.example.ontime.data.api.NominatimApi
 import com.example.ontime.data.auth.AuthManager
 import com.example.ontime.ui.friend.usecase.AddFriendUseCase
+import com.example.ontime.ui.location.LocationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,6 +36,18 @@ object AppModule {
     @Singleton
     fun provideAuthApi(apiClient: ApiClient): AuthApi {
         return apiClient.authApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideNominatimApi(apiClient: ApiClient): NominatimApi {
+        return apiClient.nominatimApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationRepository(nominatimApi: NominatimApi): LocationRepository {
+        return LocationRepository(nominatimApi)
     }
 
     @Provides
