@@ -3,6 +3,8 @@ package com.example.ontime.ui.team
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ontime.data.model.account.AccountData
+import com.example.ontime.repository.AccountRepository
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,7 @@ sealed interface TeamFormationState {
 
 @HiltViewModel
 class TeamFormationViewModel @Inject constructor(
-//    private val api: OnTimeApi
+    private val accountRepository: AccountRepository
 ) : ViewModel() {
     private val _formState = MutableStateFlow(TeamFormationData())
     val formState = _formState.asStateFlow()
@@ -54,6 +56,20 @@ class TeamFormationViewModel @Inject constructor(
                 date = date,
                 time = time
             )
+        }
+    }
+
+    fun updateAccount(account: AccountData) {
+        _formState.update {
+            it.copy(bankAccount = account)
+        }
+        // 계좌 정보 저장
+        viewModelScope.launch {
+            try {
+                accountRepository.saveAccountInfo(account)
+            } catch (e: Exception) {
+                Log.e("TeamFormation", "Error saving account info", e)
+            }
         }
     }
 
