@@ -22,7 +22,12 @@ import com.example.ontime.ui.friend.friendList.FriendListScreen
 import com.example.ontime.ui.friend.friendList.FriendListViewModel
 import com.example.ontime.ui.friend.requestAccpet.RequestListScreen
 import com.example.ontime.ui.friend.requestAccpet.RequestListViewModel
+import com.example.ontime.ui.location.LocationSelectionEvent
+import com.example.ontime.ui.location.LocationSelectionScreen
+import com.example.ontime.ui.location.LocationSelectionViewModel
+import com.example.ontime.ui.main.FriendSelectionScreen
 import com.example.ontime.ui.main.MainScreen
+import com.example.ontime.ui.team.TeamFormationScreen
 import com.example.ontime.ui.team.TeamFormationViewModel
 
 @Composable
@@ -36,18 +41,43 @@ fun MainNavigation() {
     NavHost(
         navController = navController,
 //        startDestination = Screen.Main.route
-        startDestination = Screen.Main.route
+        startDestination = Screen.TeamFormation.route
     ) {
         mainScreen(navController, context)
-//        teamFormationScreen(navController, teamFormationViewModel)
-//        friendSelectionScreen(navController, teamFormationViewModel)
+        teamFormationScreen(navController, teamFormationViewModel)
+        friendSelectionScreen(navController)
         addFriendsScreen(navController)
         contactListScreen(navController)
         friendsListScreen(navController)
         requestListScreen(navController)
+        LocationSelectionScreen(navController, teamFormationViewModel)
     }
 }
 
+
+private fun NavGraphBuilder.LocationSelectionScreen(
+    navController: NavController,
+    teamFormationViewModel: TeamFormationViewModel
+) {
+    composable(Screen.LocationSelection.route) {
+
+        val viewModel: LocationSelectionViewModel = hiltViewModel()
+
+        // 위치 선택 완료 이벤트 처리
+        LaunchedEffect(Unit) {
+            viewModel.navigationEvent.collect { event ->
+                when (event) {
+                    is LocationSelectionEvent.LocationConfirmed -> {
+                        teamFormationViewModel.updateLocation(event.address, event.latLng)
+                        navController.popBackStack()
+                    }
+                }
+            }
+        }
+
+        LocationSelectionScreen(viewModel = viewModel)
+    }
+}
 
 private fun NavGraphBuilder.requestListScreen(navController: NavController) {
     composable(Screen.RequestList.route) {
@@ -122,32 +152,37 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
         )
     }
 }
-//
-//private fun NavGraphBuilder.teamFormationScreen(
-//    navController: NavController,
-//    viewModel: TeamFormationViewModel
-//) {
-//    composable(Screen.TeamFormation.route) {
-//        TeamFormationScreen(
-//            onFriendSelectionClick = {
-//                navController.navigate(Screen.FriendSelection.route)
-//            },
-//            viewModel = viewModel
-//        )
-//    }
-//}
-//
-//private fun NavGraphBuilder.friendSelectionScreen(
-//    navController: NavController,
-//    teamFormationViewModel: TeamFormationViewModel
-//) {
-//    composable(Screen.FriendSelection.route) {
-//        FriendSelectionScreen(
+
+private fun NavGraphBuilder.teamFormationScreen(
+    navController: NavController,
+    viewModel: TeamFormationViewModel
+) {
+    composable(Screen.TeamFormation.route) {
+        TeamFormationScreen(
+            onSetLocationClick = {
+                navController.navigate(Screen.LocationSelection.route)
+            },
+            onFriendSelectionClick = {
+                navController.navigate(Screen.FriendSelection.route)
+            },
+            viewModel = viewModel
+        )
+    }
+}
+
+private fun NavGraphBuilder.friendSelectionScreen(
+    navController: NavController,
+//    teamFormationViewModel: TeamFormationViewModel,
+) {
+    composable(Screen.FriendSelection.route) {
+        val viewModel: FriendListViewModel = hiltViewModel()
+        FriendSelectionScreen(
+            viewModel = viewModel,
 //            onBackClick = { navController.popBackStack() },
 //            onFriendsSelected = { selectedFriends ->
 //                teamFormationViewModel.updateMembers(selectedFriends)
 //                navController.popBackStack()
 //            }
-//        )
-//    }
-//}
+        )
+    }
+}
