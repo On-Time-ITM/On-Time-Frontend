@@ -1,5 +1,6 @@
 package com.example.ontime.ui.main
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,6 +66,21 @@ fun MainScreen(
             .background(surfaceContainerLowest)
     ) {
         AppBar()
+
+// 로그용
+        Button(
+            onClick = {
+                val userId = viewModel.getCurrentUserId()
+                Log.d("ITM", "Current User ID: $userId")
+
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text("Check Current User ID")
+        }
+
         UserStatsCard()
         TeamSection(
             onTeamClick = onTeamClick,
@@ -76,7 +93,7 @@ fun MainScreen(
             modifier = Modifier.padding(horizontal = 24.dp)
         )
         CustomButton(
-            text = "Add Friends",
+            text = "Friends",
             onClick = onFriendClick,
             isLoading = viewModel.isLoading,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 10.dp)
