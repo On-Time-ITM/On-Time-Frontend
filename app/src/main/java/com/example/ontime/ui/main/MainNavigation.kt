@@ -14,6 +14,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.ontime.ui.auth.login.LoginActivity
 import com.example.ontime.ui.auth.logout.LogoutState
 import com.example.ontime.ui.auth.logout.LogoutViewModel
+import com.example.ontime.ui.calendar.CalendarScreen
+import com.example.ontime.ui.calendar.CalendarViewModel
 import com.example.ontime.ui.friend.addFriend.AddFriendScreen
 import com.example.ontime.ui.friend.addFriend.AddFriendViewModel
 import com.example.ontime.ui.friend.contactList.ContactListScreen
@@ -50,12 +52,36 @@ fun MainNavigation() {
         contactListScreen(navController)
         friendsListScreen(navController)
         requestListScreen(navController)
-        LocationSelectionScreen(navController, teamFormationViewModel)
+        locationSelectionScreen(navController, teamFormationViewModel)
+        calendarScreen(navController, teamFormationViewModel)
+    }
+}
+
+private fun NavGraphBuilder.calendarScreen(
+    navController: NavController,
+    teamFormationViewModel: TeamFormationViewModel
+) {
+    composable(Screen.Calendar.route) {
+
+        val viewModel: CalendarViewModel = hiltViewModel()
+
+        // 날짜 선택 완료 이벤트 처리
+//        LaunchedEffect(Unit) {
+//            viewModel
+//        }
+        CalendarScreen(
+            viewModel = viewModel,
+            onConfirm = { date, time ->
+                // 직접 LocalDate와 LocalTime을 전달
+                teamFormationViewModel.updateDateTime(date, time)
+                navController.popBackStack()
+            }
+        )
     }
 }
 
 
-private fun NavGraphBuilder.LocationSelectionScreen(
+private fun NavGraphBuilder.locationSelectionScreen(
     navController: NavController,
     teamFormationViewModel: TeamFormationViewModel
 ) {
@@ -78,6 +104,7 @@ private fun NavGraphBuilder.LocationSelectionScreen(
         LocationSelectionScreen(viewModel = viewModel)
     }
 }
+
 
 private fun NavGraphBuilder.requestListScreen(navController: NavController) {
     composable(Screen.RequestList.route) {
@@ -164,6 +191,9 @@ private fun NavGraphBuilder.teamFormationScreen(
             },
             onFriendSelectionClick = {
                 navController.navigate(Screen.FriendSelection.route)
+            },
+            onCalendarClick = {
+                navController.navigate(Screen.Calendar.route)
             },
             viewModel = viewModel
         )
