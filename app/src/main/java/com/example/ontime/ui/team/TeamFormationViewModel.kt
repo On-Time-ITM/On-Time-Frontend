@@ -11,6 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 sealed interface TeamFormationState {
@@ -50,11 +55,31 @@ class TeamFormationViewModel @Inject constructor(
         _formState.update { it.copy(members = members) }
     }
 
-    fun updateDateTime(date: String, time: String) {
-        _formState.update {
-            it.copy(
-                date = date,
-                time = time
+    // ISO 8601 형식으로 변환
+    private fun convertToISODateTime(date: LocalDate, time: LocalTime): String {
+        val dateTime = LocalDateTime.of(date, time)
+        val zoned = dateTime.atZone(ZoneId.systemDefault())
+        return zoned.toInstant().toString()
+    }
+
+    //    ISO 8601 문자열을 LocalDateTime으로 파싱
+//    fun parseISODateTime(isoDateTime: String): LocalDateTime {
+//        return Instant.parse(isoDateTime)
+//            .atZone(ZoneId.systemDefault())
+//            .toLocalDateTime()
+//    }
+
+
+    fun updateDateTime(date: LocalDate, time: LocalTime) {
+        val isoDateTime = convertToISODateTime(date, time)
+        val formattedDate = date.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
+        val formattedTime = time.format(DateTimeFormatter.ofPattern("HH:mm"))
+
+        _formState.update { currentState ->
+            currentState.copy(
+                meetingDateTime = isoDateTime,
+                date = formattedDate,
+                time = formattedTime
             )
         }
     }
