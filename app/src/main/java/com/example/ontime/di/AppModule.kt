@@ -52,6 +52,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
+    @Provides
+    @Singleton
     fun provideAuthManager(@ApplicationContext context: Context): AuthManager {
         return AuthManager(context)
     }
