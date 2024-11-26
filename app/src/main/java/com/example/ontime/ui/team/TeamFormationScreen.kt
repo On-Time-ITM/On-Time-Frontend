@@ -43,11 +43,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.ontime.R
+import com.example.ontime.data.model.account.AccountData
 import com.example.ontime.ui.component.AppBar
 import com.example.ontime.ui.component.CustomButton
 import com.example.ontime.ui.theme.ButtonText
@@ -56,11 +57,6 @@ import com.example.ontime.ui.theme.body_medium
 import com.example.ontime.ui.theme.shadow
 import com.example.ontime.ui.theme.surfaceContainerLowest
 
-@Preview
-@Composable
-fun a() {
-//    TeamFormationScreen(onFriendSelectionClick = { /*TODO*/ })
-}
 
 @Composable
 fun TeamFormationScreen(
@@ -70,7 +66,13 @@ fun TeamFormationScreen(
 ) {
     var title by remember { mutableStateOf("") }
     var showTitleDialog by remember { mutableStateOf(false) }
+    var showAccountDialog by remember { mutableStateOf(false) }
     val formState by viewModel.formState.collectAsState()
+
+//    // 계좌 정보 상태
+//    var bankName by remember { mutableStateOf("") }
+//    var accountNumber by remember { mutableStateOf("") }
+//    var accountHolder by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -117,6 +119,17 @@ fun TeamFormationScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
 
+            // 계좌 정보 입력 Row 추가
+            InputRow(
+                text = formState.bankAccount?.let { "${it.bankName} - ${it.accountNumber}" }
+                    ?: "Enter bank account information",
+                icon = R.drawable.bank,
+                onClick = { showAccountDialog = true }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
             // Date and Time Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -151,6 +164,7 @@ fun TeamFormationScreen(
             )
         }
 
+        // title 다이얼로그
         TitleInputDialog(
             showDialog = showTitleDialog,
             onDismiss = { showTitleDialog = false },
@@ -159,6 +173,15 @@ fun TeamFormationScreen(
             onConfirm = {
                 showTitleDialog = false
                 viewModel.updateTitle(title)
+            }
+        )
+        // 계좌 정보 다이얼로그
+        AccountInputDialog(
+            showDialog = showAccountDialog,
+            onDismiss = { showAccountDialog = false },
+            currentAccount = formState.bankAccount,
+            onConfirm = { account ->
+                viewModel.updateAccount(account)
             }
         )
     }
@@ -254,45 +277,133 @@ private fun TitleInputDialog(
     }
 }
 
-
 @Composable
-private fun TeamFormationInputs(
-    title: String,
-    members: String,
-    onClick: () -> Unit
+private fun AccountInputDialog(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    currentAccount: AccountData?,
+    onConfirm: (AccountData) -> Unit
 ) {
-    val displayTitle = if (title.isBlank()) "Enter the schedule title" else title
+    if (showDialog) {
+        var bankName by remember { mutableStateOf(currentAccount?.bankName ?: "") }
+        var accountNumber by remember { mutableStateOf(currentAccount?.accountNumber ?: "") }
+        var accountHolder by remember { mutableStateOf(currentAccount?.accountHolder ?: "") }
 
-    InputRow(displayTitle, Icons.Filled.Edit, onClick = onClick)
-    InputRow("Select friends to join the schedule", Icons.Filled.Person, onClick = onClick)
-    // Date and Time Row
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Filled.DateRange,
-            contentDescription = null,
-            tint = shadow,
+        AlertDialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(usePlatformDefaultWidth = false),
             modifier = Modifier
-                .size(32.dp)
-                .padding(end = 12.dp)
-        )
-        DateTimeInput(
-            modifier = Modifier.weight(2f),
-            text = "2024/10/25",
-            icon = Icons.Filled.DateRange
-        )
-        DateTimeInput(
-            modifier = Modifier.weight(1f),
-            text = "10:00",
-            icon = Icons.Filled.DateRange
+                .fillMaxWidth(0.9f)
+                .padding(16.dp),
+            title = {
+                Column {
+                    Text(
+                        "Enter Bank Account Information",
+                        fontSize = 20.sp,
+                        color = shadow,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    TextField(
+                        value = bankName,
+                        onValueChange = { bankName = it },
+                        placeholder = { Text("Bank name", color = Color.Gray) },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0x1FE9E9E9),
+                            focusedContainerColor = Color(0x1FE9E9E9),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(5.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    TextField(
+                        value = accountNumber,
+                        onValueChange = { accountNumber = it },
+                        placeholder = { Text("Account number", color = Color.Gray) },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0x1FE9E9E9),
+                            focusedContainerColor = Color(0x1FE9E9E9),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(5.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    TextField(
+                        value = accountHolder,
+                        onValueChange = { accountHolder = it },
+                        placeholder = { Text("Account holder", color = Color.Gray) },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color(0x1FE9E9E9),
+                            focusedContainerColor = Color(0x1FE9E9E9),
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        shape = RoundedCornerShape(5.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                ) {
+                    Button(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = MainColor
+                        ),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(100.dp)
+                            .border(1.dp, MainColor, RoundedCornerShape(10.dp))
+                    ) {
+                        Text("Cancel", fontSize = body_medium)
+                    }
+
+                    Button(
+                        onClick = {
+                            onConfirm(
+                                AccountData(
+                                    bankName = bankName,
+                                    accountNumber = accountNumber,
+                                    accountHolder = accountHolder
+                                )
+                            )
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MainColor,
+                            contentColor = ButtonText
+                        ),
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(100.dp),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text("Confirm", fontSize = body_medium)
+                    }
+                }
+            },
+            containerColor = surfaceContainerLowest,
+            shape = RoundedCornerShape(8.dp)
         )
     }
-    Spacer(modifier = Modifier.height(24.dp))
 }
-
 
 @Composable
 private fun InputRow(
@@ -366,11 +477,3 @@ private fun DateTimeInput(
         }
     }
 }
-//
-//private data class InputField(
-//    val label: String,
-//    val icon: Any
-//)
-
-// TeamFormationInputs, TitleInputDialog, InputRow, DateTimeInput 컴포넌트들은
-// 그대로 유지하면서 파일 하단으로 이동
