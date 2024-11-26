@@ -1,6 +1,7 @@
 package com.example.ontime.ui.team
 
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,6 +61,7 @@ import com.example.ontime.ui.theme.surfaceContainerLowest
 
 @Composable
 fun TeamFormationScreen(
+    onCalendarClick: () -> Unit,
     onSetLocationClick: () -> Unit,
     onFriendSelectionClick: () -> Unit,
     viewModel: TeamFormationViewModel = hiltViewModel()
@@ -92,6 +94,50 @@ fun TeamFormationScreen(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp)
         )
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+//                    .padding(bottom = 24.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { /* TODO: Navigate to logo creation screen */ }
+                        .border(
+                            width = 1.dp,
+                            color = Color(0xFFE0E0E0),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ontime_logo),
+                        contentDescription = "Team Logo",
+                        modifier = Modifier
+                            .size(60.dp)  // 로고 크기 조절
+                            .border(  // 로고 주변에 원형 테두리 추가
+                                width = 1.dp,
+                                color = Color(0xFFE0E0E0),
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                    )
+                    Column {
+                        Text(
+                            text = "Make your own team logo!",
+                            fontSize = 16.sp,
+                            color = shadow
+                        )
+                        Text(
+                            text = "Click to customize your team's identity",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
             // Title input
             InputRow(
                 text = if (title.isBlank()) "Enter the schedule title" else title,
@@ -132,7 +178,8 @@ fun TeamFormationScreen(
 
             // Date and Time Row
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -144,16 +191,24 @@ fun TeamFormationScreen(
                         .size(32.dp)
                         .padding(end = 12.dp)
                 )
-                DateTimeInput(
-                    modifier = Modifier.weight(2f),
-                    text = formState.date.ifEmpty { "2024/10/25" },
-                    icon = Icons.Filled.DateRange
-                )
-                DateTimeInput(
-                    modifier = Modifier.weight(1f),
-                    text = formState.time.ifEmpty { "10:00" },
-                    icon = Icons.Filled.DateRange
-                )
+                Row(
+                    modifier = Modifier
+                        .clickable(onClick = onCalendarClick),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    DateTimeInput(
+                        modifier = Modifier
+                            .weight(2f),
+                        text = formState.date.ifEmpty { "2024/10/25" },
+                        icon = Icons.Filled.DateRange
+                    )
+                    DateTimeInput(
+                        modifier = Modifier.weight(1f),
+                        text = formState.time.ifEmpty { "10:00" },
+                        icon = Icons.Filled.DateRange
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.height(24.dp))
 
