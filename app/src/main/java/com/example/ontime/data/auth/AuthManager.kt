@@ -2,6 +2,8 @@ package com.example.ontime.data.auth
 
 import android.content.Context
 import android.util.Log
+import com.example.ontime.data.model.response.TokenInfoResponse
+import com.example.ontime.data.model.response.UserInfoResponse
 import javax.inject.Inject
 
 class AuthManager @Inject constructor(
@@ -10,26 +12,43 @@ class AuthManager @Inject constructor(
     //
     private val prefs = context.getSharedPreferences("authInfo", Context.MODE_PRIVATE)
 
-    //
-//
-    fun saveAuthInfo(accessToken: String, refreshToken: String, expiresIn: Int, userId: String) {
-        Log.d("ITM", "Saving user ID: $userId")
+    // 토큰 가져오기
+    fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
 
-        // SharedPreferences 사용 (웹의 local storage와 비슷)
+    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
+
+    fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
+
+    fun getExpiresIn(): Long = prefs.getLong(KEY_EXPIRES_IN, 0)
+
+    // 새로 추가된 사용자 정보 가져오기
+    fun getName(): String? = prefs.getString(KEY_NAME, null)
+
+    fun getPhoneNumber(): String? = prefs.getString(KEY_PHONE_NUMBER, null)
+
+    fun getTardinessRate(): Float = prefs.getFloat(KEY_TARDINESS_RATE, 0f)
+
+
+    fun saveAuthInfo(
+        userInfo: UserInfoResponse,
+        tokenInfo: TokenInfoResponse
+    ) {
+        Log.d("ITM", "Saving user info - ID: ${userInfo.id}, Name: ${userInfo.name}")
+
         prefs.edit()
-            .putString(KEY_ACCESS_TOKEN, accessToken)
-            .putString(KEY_REFRESH_TOKEN, refreshToken)
-            .putInt(
-                KEY_EXPIRES_IN, expiresIn
-            ).putString(KEY_USER_ID, userId)
+            .putString(KEY_ACCESS_TOKEN, tokenInfo.accessToken)
+            .putString(KEY_REFRESH_TOKEN, tokenInfo.refreshToken.token)
+            .putInt(KEY_EXPIRES_IN, tokenInfo.accessTokenExpiresIn)
+            .putString(KEY_USER_ID, userInfo.id)
+            .putString(KEY_NAME, userInfo.name)
+            .putString(KEY_PHONE_NUMBER, userInfo.phoneNumber)
             .apply()
+
         val savedUserId = getUserId()
         Log.d("ITM", "Verified saved user ID: $savedUserId")
-
-        return
     }
 
-    //
+
 //    // API 호출 시 토큰 확인 및 갱신
 //    suspend fun getValidAccessToken(): String {
 //        if (isAccessTokenExpired()) {
@@ -51,25 +70,36 @@ class AuthManager @Inject constructor(
 //        }
 //    }
 
-    //    토큰 가져오기
-    fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
+    // 사용자 정보를 한 번에 가져오는 데이터 클래스
+    data class UserInfo(
+        val userId: String,
+        val name: String,
+        val phoneNumber: String,
+        val tardinessRate: Float
+    )
 
-    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
+    // 저장된 모든 사용자 정보를 한 번에 가져오기
+    fun getUserInfo(): UserInfo? {
+        val userId = getUserId() ?: return null
+        val name = getName() ?: return null
+        val phoneNumber = getPhoneNumber() ?: return null
+        val tardinessRate = getTardinessRate()
 
-    fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
+        return UserInfo(userId, name, phoneNumber, tardinessRate)
+    }
 
-    fun getExpiresIn(): Long = prefs.getLong(KEY_EXPIRES_IN, 0)
-
-    // 로그아웃 (토큰 삭제)
+    // 로그아웃 (모든 정보 삭제)
     fun clearAuthInfo() {
         prefs.edit().clear().apply()
     }
-
 
     companion object {
         private const val KEY_ACCESS_TOKEN = "access_token"
         private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_EXPIRES_IN = "expires_in"
         private const val KEY_USER_ID = "user_id"
+        private const val KEY_NAME = "name"
+        private const val KEY_PHONE_NUMBER = "phone_number"
+        private const val KEY_TARDINESS_RATE = "tardiness_rate"  // 이 필드는 아직 필요한가요?
     }
 }

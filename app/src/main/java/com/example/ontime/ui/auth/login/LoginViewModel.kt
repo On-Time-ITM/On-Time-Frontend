@@ -59,14 +59,15 @@ class LoginViewModel @Inject constructor(
                 val request = LoginRequest(phoneNumber, password)
                 val response = authApi.login(request)
                 Log.d("ITM", "Request: ${request}") // 실제 전송되는 요청 데이터 확인
+
+
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
                         authManager.saveAuthInfo(
-                            loginResponse.accessToken,
-                            loginResponse.refreshToken,
-                            loginResponse.expiresIn,
-                            loginResponse.userId
+                            userInfo = loginResponse.userInfo,
+                            tokenInfo = loginResponse.tokenInfo
                         )
+                        Log.d("ITM", "$loginResponse")
                     }
                     _loginState.value = LoginState.Success
                 } else {
@@ -75,7 +76,6 @@ class LoginViewModel @Inject constructor(
                     Log.d("ITM", "Status Code: ${response.code()}")
                     Log.d("ITM", "Error Body: $errorBody")
                 }
-
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Unknown error")
             } finally {
