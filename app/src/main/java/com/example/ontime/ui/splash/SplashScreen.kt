@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ontime.R
+import com.example.ontime.ui.theme.MainColor
 import kotlinx.coroutines.delay
 
 @Composable
@@ -43,6 +44,9 @@ fun SplashScreen(
     // 커스텀 폰트 정의
     val warningFont = FontFamily(
         Font(R.font.bebas_neue_regular)
+    )
+    val warningFont2 = FontFamily(
+        Font(R.font.roboto_bold)
     )
 
     var startWarningAnimation by remember { mutableStateOf(false) }
@@ -97,10 +101,10 @@ fun SplashScreen(
         // Warning Text with custom font
         if (!showLogo) {
             Text(
-                text = "DON'T BE LATE!!!",
+                text = "DON'T BE LATE!",
                 fontSize = 38.sp,
-                fontFamily = warningFont,
-                color = Color.Red,
+                fontFamily = warningFont2,
+                color = MainColor,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .scale(warningScale.value)
