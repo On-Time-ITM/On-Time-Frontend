@@ -10,6 +10,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
+        manifestPlaceholders += mapOf()
         applicationId = "com.example.ontime"
         minSdk = 30
         targetSdk = 34

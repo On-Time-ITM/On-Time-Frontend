@@ -2,4 +2,32 @@
 <resources>
 
     <style name="Theme.OnTime" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="CustomTimePickerDialog" parent="android:Theme.Material.Light.Dialog">
+        <!-- 메인 색상 (시간 선택 원과 확인 버튼) -->
+        <item name="android:colorAccent">@color/main_color</item>
+
+        <!-- 기본 텍스트 색상 -->
+        <item name="android:textColorPrimary">@color/black</item>
+
+        <!-- 보조 텍스트 색상 -->
+        <!--        <item name="android:textColorSecondary">@color/black</item>-->
+
+        <!-- 배경 색상 -->
+        <item name="android:windowBackground">@color/white</item>
+
+        <!-- 버튼 색상 -->
+        <item name="android:colorButtonNormal">@color/main_color</item>
+
+        <!-- 다이얼로그 크기 -->
+        <item name="android:windowMinWidthMajor">328dp</item>
+        <item name="android:windowMinWidthMinor">328dp</item>
+    </style>
+
+
+    <style name="Theme.OnTime.Splash" parent="Theme.OnTime">
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>
