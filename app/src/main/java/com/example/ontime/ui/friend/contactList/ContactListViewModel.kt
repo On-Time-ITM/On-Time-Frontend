@@ -31,7 +31,6 @@ class ContactListViewModel @Inject constructor(
     var uiState by mutableStateOf(UiState())
         private set
 
-    // 권한 체크 함수 추가
     fun checkPermission(): Boolean {
         return ActivityCompat.checkSelfPermission(
             context,
@@ -39,7 +38,6 @@ class ContactListViewModel @Inject constructor(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    // 연락처 가져오는 로직을 suspend 함수로 변경하고 상태 관리 추가
     fun fetchContacts() {
         viewModelScope.launch {
             try {
