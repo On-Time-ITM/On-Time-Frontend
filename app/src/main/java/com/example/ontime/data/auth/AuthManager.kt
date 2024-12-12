@@ -19,7 +19,7 @@ class AuthManager @Inject constructor(
 
     fun getUserId(): String? = prefs.getString(KEY_USER_ID, null)
 
-    fun getExpiresIn(): Long = prefs.getLong(KEY_EXPIRES_IN, 0)
+    fun getExpiresIn(): Int = prefs.getInt(KEY_EXPIRES_IN, 0)
 
     // 새로 추가된 사용자 정보 가져오기
     fun getName(): String? = prefs.getString(KEY_NAME, null)
@@ -28,13 +28,15 @@ class AuthManager @Inject constructor(
 
     fun getTardinessRate(): Float = prefs.getFloat(KEY_TARDINESS_RATE, 0f)
 
+    private fun getLoginTimestamp(): Long = prefs.getLong(KEY_LOGIN_TIMESTAMP, 0L)
+
 
     fun saveAuthInfo(
         userInfo: UserInfoResponse,
         tokenInfo: TokenInfoResponse
     ) {
         Log.d("ITM", "Saving user info - ID: ${userInfo.id}, Name: ${userInfo.name}")
-
+    
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, tokenInfo.accessToken)
             .putString(KEY_REFRESH_TOKEN, tokenInfo.refreshToken.token)
@@ -42,13 +44,44 @@ class AuthManager @Inject constructor(
             .putString(KEY_USER_ID, userInfo.id)
             .putString(KEY_NAME, userInfo.name)
             .putString(KEY_PHONE_NUMBER, userInfo.phoneNumber)
+            .putFloat(KEY_TARDINESS_RATE, userInfo.statistics.lateRate.toFloat())
+            .putLong(KEY_LOGIN_TIMESTAMP, System.currentTimeMillis())
             .apply()
-
+    
         val savedUserId = getUserId()
+        Log.d("ITM", "Logged in successfully!")
         Log.d("ITM", "Verified saved user ID: $savedUserId")
     }
 
+    fun isLoggedIn(): Boolean {
+        val accessToken = getAccessToken()
+        val loginTimestamp = getLoginTimestamp()
+        val expiresIn = getExpiresIn()
 
+        Log.d(
+            "ITM",
+            "Checking login status - Token: ${accessToken != null}, Timestamp: $loginTimestamp"
+        )
+
+        if (accessToken.isNullOrBlank()) {
+            Log.d("ITM", "No access token found")
+            return false
+        }
+
+        // 토큰 만료 시간 체크
+        val currentTime = System.currentTimeMillis()
+        val elapsedTime = currentTime - loginTimestamp
+        val expirationTime = expiresIn * 1000L // 초를 밀리초로 변환
+
+        val isValid = elapsedTime < expirationTime
+//        val isValid = true
+        Log.d(
+            "ITM",
+            "Token validity check - Elapsed: $elapsedTime, Expiration: $expirationTime, IsValid: $isValid"
+        )
+
+        return isValid
+    }
 //    // API 호출 시 토큰 확인 및 갱신
 //    suspend fun getValidAccessToken(): String {
 //        if (isAccessTokenExpired()) {
@@ -101,5 +134,6 @@ class AuthManager @Inject constructor(
         private const val KEY_NAME = "name"
         private const val KEY_PHONE_NUMBER = "phone_number"
         private const val KEY_TARDINESS_RATE = "tardiness_rate"  // 이 필드는 아직 필요한가요?
+        private const val KEY_LOGIN_TIMESTAMP = "login_timestamp"
     }
 }
