@@ -25,15 +25,17 @@ class AccountRepository @Inject constructor(private val context: Context) {
         encryptedSharedPrefs.edit()
             .putString("bank_name", accountData.bankName)
             .putString("account_number", accountData.accountNumber)
-            .putString("account_holder", accountData.accountHolder)
+            .putString("account_holder", accountData.accountHost)
+            .putInt("late_fee", accountData.lateFee)
             .apply()
     }
 
     fun getAccountInfo(): AccountData? {
         val bankName = encryptedSharedPrefs.getString("bank_name", null) ?: return null
         val accountNumber = encryptedSharedPrefs.getString("account_number", null) ?: return null
-        val accountHolder = encryptedSharedPrefs.getString("account_holder", null) ?: return null
+        val accountHost = encryptedSharedPrefs.getString("account_holder", null) ?: return null
+        val lateFee = encryptedSharedPrefs.getInt("late_fee", 0)
 
-        return AccountData(bankName, accountNumber, accountHolder)
+        return AccountData(bankName, accountNumber, accountHost, lateFee)
     }
 }
