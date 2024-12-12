@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-// SignupViewModel - 회원가입 관련 비즈니스 로직과 상태 관리를 담당
-
 @HiltViewModel
 class SignupViewModel @Inject constructor(
     private val authApi: AuthApi,
@@ -24,27 +22,22 @@ class SignupViewModel @Inject constructor(
     private val _signupState = MutableStateFlow<SignupState>(SignupState.Initial)
     val signupState: StateFlow<SignupState> = _signupState.asStateFlow()
 
-    // 회원가입 API 호출 함수r
+    // 회원가입 API 호출 함수
     fun signup(name: String, phoneNumber: String, password: String) {
         viewModelScope.launch {
             try {
                 // 로딩 상태로 변경
                 _signupState.value = SignupState.Loading
 
-                // API 요청 객체 생성
                 val request =
                     SignupRequest(name = name, phoneNumber = phoneNumber, password = password)
-                // 회원가입 API 호출
                 val response = authApi.signup(request)
 
-                // 응답 처리
                 if (response.isSuccessful) {
                     response.body()?.let { signupResponse ->
                         authManager.saveAuthInfo(
-                            signupResponse.accessToken,
-                            signupResponse.refreshToken,
-                            signupResponse.expiresIn,
-                            signupResponse.userId
+                            userInfo = signupResponse.userInfo,
+                            tokenInfo = signupResponse.tokenInfo
                         )
                     }
                     _signupState.value = SignupState.Success
@@ -58,7 +51,6 @@ class SignupViewModel @Inject constructor(
                     Log.d("ITM", "Error Body: $errorBody")
                 }
             } catch (e: Exception) {
-                // 에러 처리
                 _signupState.value = SignupState.Error(e.message ?: "Unknown error")
                 Log.d("ITM", e.message ?: "Unknown error")
             }
@@ -68,8 +60,8 @@ class SignupViewModel @Inject constructor(
 
 // 회원가입 진행 상태를 나타내는 sealed class
 sealed class SignupState {
-    object Initial : SignupState()    // 초기 상태
-    object Loading : SignupState()    // API 호출 중
-    object Success : SignupState()    // API 호출 성공
-    data class Error(val message: String) : SignupState()  // API 호출 실패
+    object Initial : SignupState()
+    object Loading : SignupState()
+    object Success : SignupState()
+    data class Error(val message: String) : SignupState()
 }
