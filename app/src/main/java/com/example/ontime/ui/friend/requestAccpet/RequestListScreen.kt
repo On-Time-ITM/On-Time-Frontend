@@ -44,7 +44,6 @@ import com.example.ontime.ui.theme.MainColor
 fun RequestListScreen(
     viewModel: RequestListViewModel,
     modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit
 ) {
     val uiState = viewModel.uiState
 
@@ -106,7 +105,6 @@ fun RequestListScreen(
         StatusDialog(
             title = "Success",
             message = "Friend request accepted!",
-            isSuccess = true,
             onDismiss = {
                 viewModel.clearAcceptSuccess()  // clearSuccess() 대신 clearAcceptSuccess() 사용
                 // 성공 후 리스트 갱신
@@ -120,7 +118,6 @@ fun RequestListScreen(
         StatusDialog(
             title = "Notice",
             message = error,
-            isSuccess = false,
             onDismiss = { viewModel.clearError() }
         )
     }
@@ -207,7 +204,6 @@ fun RequestsRow(
 private fun StatusDialog(
     title: String,
     message: String,
-    isSuccess: Boolean,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
