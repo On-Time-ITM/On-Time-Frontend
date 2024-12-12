@@ -9,7 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.ontime.data.api.FriendApi
 import com.example.ontime.data.auth.AuthManager
 import com.example.ontime.data.model.response.FriendResponse
+import com.example.ontime.ui.friendSelection.FriendSelectionEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,6 +24,7 @@ class FriendListViewModel @Inject constructor(
 ) : ViewModel() {
     data class UiState(
         val friends: List<FriendResponse> = emptyList(),
+        val selectedFriends: List<FriendResponse> = emptyList(),
         val isLoading: Boolean = false,
         val error: String? = null,
         val isSuccess: Boolean = false,
@@ -32,16 +36,29 @@ class FriendListViewModel @Inject constructor(
     var userId by mutableStateOf(authManager.getUserId())
         private set
 
+    fun addFriend(friend: FriendResponse) {
+        if (!uiState.selectedFriends.contains(friend)) {
+            uiState = uiState.copy(
+                selectedFriends = uiState.selectedFriends + friend
+            )
+        }
+        Log.d("ITM", "${uiState.selectedFriends}")
+    }
+
+    fun removeFriend(friend: FriendResponse) {
+        uiState = uiState.copy(
+            selectedFriends = uiState.selectedFriends.filter { it.id != friend.id }
+        )
+    }
 
     fun getFriendsList() {
         viewModelScope.launch {
             try {
                 uiState = uiState.copy(isLoading = true)
-                val response = friendApi.getFriends(userId = userId.toString())
+                val response = friendApi.getFriendList(userId = userId.toString())
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
                         Log.d("ITM", "${responseBody}")
-                        // 친구 목록을 uiState에 저장하고 로딩 상태를 false로 변경
                         uiState = uiState.copy(
                             friends = responseBody,
                             isLoading = false,
@@ -51,8 +68,7 @@ class FriendListViewModel @Inject constructor(
                 } else {
                     val errorBody = response.errorBody()?.string()
                     Log.d("ITM", "Status Code: ${response.code()}")
-                    Log.d("ITM", "Error Body: $errorBody")
-                    // 에러 발생 시 에러 메시지 저장하고 로딩 상태를 false로 변경
+                    Log.d("ITM", "Error Body: ${response.message()}")
                     uiState = uiState.copy(
                         error = errorBody ?: "Unknown error occurred",
                         isLoading = false
@@ -65,6 +81,21 @@ class FriendListViewModel @Inject constructor(
                     isLoading = false
                 )
             }
+        }
+    }
+
+    // 위치가 선택되었을 때의 콜백을 위한 이벤트
+    private val _navigationEvent = MutableSharedFlow<FriendSelectionEvent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
+    fun confirmFriendSelection() {
+        viewModelScope.launch {
+            _navigationEvent.emit(
+                FriendSelectionEvent.FriendsConfirmed(
+                    selectedFriends = uiState.selectedFriends.map { it.id },
+                    selectedFriendsList = uiState.selectedFriends.map { it }
+                )
+            )
         }
     }
 }
