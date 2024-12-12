@@ -12,8 +12,8 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface FriendApi {
-    @GET("/api/v1/friendship/{userId}")
-    suspend fun getFriends(@Path("userId") userId: String): Response<List<FriendResponse>>
+    @GET("/api/v1/friendship/list/{userId}")
+    suspend fun getFriendList(@Path("userId") userId: String): Response<List<FriendResponse>>
 
     @POST("/api/v1/friendship")
     suspend fun addFriend(@Body request: AddFriendRequest): Response<Unit>
@@ -25,4 +25,5 @@ interface FriendApi {
     suspend fun acceptFriendshipRequest(
         @Body request: FriendshipRequestAcceptRequest
     ): Response<Unit>
+
 }
