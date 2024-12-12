@@ -1,3 +1,5 @@
+package com.example.ontime.ui.main
+
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -8,9 +10,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.ontime.navigation.Screen
 import com.example.ontime.ui.auth.login.LoginActivity
 import com.example.ontime.ui.auth.logout.LogoutState
 import com.example.ontime.ui.auth.logout.LogoutViewModel
@@ -24,13 +29,14 @@ import com.example.ontime.ui.friend.friendList.FriendListScreen
 import com.example.ontime.ui.friend.friendList.FriendListViewModel
 import com.example.ontime.ui.friend.requestAccpet.RequestListScreen
 import com.example.ontime.ui.friend.requestAccpet.RequestListViewModel
+import com.example.ontime.ui.friendSelection.FriendSelectionEvent
 import com.example.ontime.ui.location.LocationSelectionEvent
 import com.example.ontime.ui.location.LocationSelectionScreen
 import com.example.ontime.ui.location.LocationSelectionViewModel
-import com.example.ontime.ui.main.FriendSelectionScreen
-import com.example.ontime.ui.main.MainScreen
 import com.example.ontime.ui.team.TeamFormationScreen
 import com.example.ontime.ui.team.TeamFormationViewModel
+import com.example.ontime.ui.team.teamDetail.TeamDetailScreen
+import com.example.ontime.ui.team.teamDetail.TeamDetailViewModel
 
 @Composable
 fun MainNavigation() {
@@ -42,18 +48,37 @@ fun MainNavigation() {
 
     NavHost(
         navController = navController,
-//        startDestination = Screen.Main.route
-        startDestination = Screen.TeamFormation.route
+        startDestination = Screen.Main.route
+//        startDestination = Screen.TeamDetail.route
     ) {
         mainScreen(navController, context)
         teamFormationScreen(navController, teamFormationViewModel)
-        friendSelectionScreen(navController)
+        friendSelectionScreen(navController, teamFormationViewModel)
         addFriendsScreen(navController)
         contactListScreen(navController)
         friendsListScreen(navController)
         requestListScreen(navController)
         locationSelectionScreen(navController, teamFormationViewModel)
         calendarScreen(navController, teamFormationViewModel)
+        teamDetailScreen(navController)
+    }
+}
+
+private fun NavGraphBuilder.teamDetailScreen(navController: NavController) {
+    composable(
+        route = "${Screen.TeamDetail.route}/{teamId}",
+        arguments = listOf(
+            navArgument("teamId") { type = NavType.StringType }
+        )
+    ) { backStackEntry ->
+        val viewModel: TeamDetailViewModel = hiltViewModel()
+
+        LaunchedEffect(Unit) {
+            // 화면 진입 시 팀 상세 정보 로드
+            viewModel.getTeamDetail()
+        }
+
+        TeamDetailScreen(viewModel = viewModel)
     }
 }
 
@@ -109,9 +134,7 @@ private fun NavGraphBuilder.locationSelectionScreen(
 private fun NavGraphBuilder.requestListScreen(navController: NavController) {
     composable(Screen.RequestList.route) {
         val viewModel: RequestListViewModel = hiltViewModel()
-        RequestListScreen(viewModel = viewModel) {
-
-        }
+        RequestListScreen(viewModel = viewModel)
     }
 }
 
@@ -147,8 +170,9 @@ private fun NavGraphBuilder.addFriendsScreen(navController: NavController) {
 
 private fun NavGraphBuilder.mainScreen(navController: NavController, context: Context) {
     composable(Screen.Main.route) {
-        val viewModel: LogoutViewModel = hiltViewModel()
-        val logoutState by viewModel.logoutState.collectAsState()
+        val logoutViewModel: LogoutViewModel = hiltViewModel()
+        val viewModel: MainViewModel = hiltViewModel()
+        val logoutState by logoutViewModel.logoutState.collectAsState()
 
         // 로그아웃 상태 처리
         LaunchedEffect(logoutState) {
@@ -164,16 +188,16 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
             }
         }
         MainScreen(
-            onLogout = { viewModel.logout() },
+            onLogout = { logoutViewModel.logout() },
             onAddTeamClick = {
                 navController.navigate(Screen.TeamFormation.route)
             },
             onFriendClick = {
                 navController.navigate(Screen.FriendsList.route)
             },
-            onTeamClick = { team ->
-                // 팀 상세 화면으로 이동
-//                navController.navigate("${Screen.TeamDetail.route}/${team.title}")
+            onTeamClick = { meeting ->
+                // TeamDetail 화면으로 이동하면서 meetingId 전달
+                navController.navigate("${Screen.TeamDetail.route}/${meeting.id}")
             },
             viewModel = viewModel
         )
@@ -185,6 +209,9 @@ private fun NavGraphBuilder.teamFormationScreen(
     viewModel: TeamFormationViewModel
 ) {
     composable(Screen.TeamFormation.route) {
+        LaunchedEffect(Unit) {
+            viewModel.resetState()
+        }
         TeamFormationScreen(
             onSetLocationClick = {
                 navController.navigate(Screen.LocationSelection.route)
@@ -195,6 +222,17 @@ private fun NavGraphBuilder.teamFormationScreen(
             onCalendarClick = {
                 navController.navigate(Screen.Calendar.route)
             },
+            onNavigateToTeamDetail = { teamId ->
+
+                viewModel.resetAfterCreation()
+                // 팀 상세 페이지로 이동
+                navController.navigate("${Screen.TeamDetail.route}/$teamId") {
+                    // 팀 생성 화면들을 백스택에서 제거
+                    popUpTo(Screen.TeamFormation.route) {
+                        inclusive = true
+                    }
+                }
+            },
             viewModel = viewModel
         )
     }
@@ -202,17 +240,25 @@ private fun NavGraphBuilder.teamFormationScreen(
 
 private fun NavGraphBuilder.friendSelectionScreen(
     navController: NavController,
-//    teamFormationViewModel: TeamFormationViewModel,
+    teamFormationViewModel: TeamFormationViewModel,
 ) {
     composable(Screen.FriendSelection.route) {
         val viewModel: FriendListViewModel = hiltViewModel()
+
+        LaunchedEffect(Unit) {
+            viewModel.navigationEvent.collect { event
+                ->
+                when (event) {
+                    is FriendSelectionEvent.FriendsConfirmed -> {
+                        teamFormationViewModel.updateMembersList(event.selectedFriendsList)
+                        navController.popBackStack()
+                    }
+                }
+            }
+        }
+
         FriendSelectionScreen(
-            viewModel = viewModel,
-//            onBackClick = { navController.popBackStack() },
-//            onFriendsSelected = { selectedFriends ->
-//                teamFormationViewModel.updateMembers(selectedFriends)
-//                navController.popBackStack()
-//            }
+            viewModel = viewModel
         )
     }
 }
