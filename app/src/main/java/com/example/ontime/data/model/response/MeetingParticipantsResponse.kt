@@ -1,5 +1,7 @@
 package com.example.ontime.data.model.response
 
+import com.example.ontime.data.model.request.LocationInfo
+
 
 data class MeetingParticipantsResponse(
     val meetingId: String,
@@ -8,12 +10,5 @@ data class MeetingParticipantsResponse(
 
 data class ParticipantLocationInfo(
     val participantId: String,
-    val participantLocation: ParticipantLocation
+    val participantLocation: LocationInfo
 )
-
-data class ParticipantLocation(
-    val latitude: Double,
-    val longitude: Double,
-    val address: String
-)
-
