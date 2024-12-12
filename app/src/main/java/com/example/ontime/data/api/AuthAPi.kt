@@ -7,6 +7,7 @@ import com.example.ontime.data.model.response.SignupResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AuthApi {
     @POST("/api/v1/auth/signup")
@@ -16,6 +17,5 @@ interface AuthApi {
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
     @POST("/api/v1/auth/logout")
-    suspend fun logout(): Response<Unit> // 빈 객체를 받으므로 Unit 사용
-
+    suspend fun logout(@Query("userId") userId: String): Response<Unit>
 }
