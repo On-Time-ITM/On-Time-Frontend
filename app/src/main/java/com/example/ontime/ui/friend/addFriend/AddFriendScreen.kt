@@ -37,16 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
-import com.example.ontime.test.TestViewModel
 import com.example.ontime.ui.component.AppBar
 import com.example.ontime.ui.component.CustomButton
 import com.example.ontime.ui.theme.ButtonText
 import com.example.ontime.ui.theme.MainColor
-import com.example.ontime.ui.theme.OnTimeTheme
 import com.example.ontime.ui.theme.body_medium
 import com.example.ontime.ui.theme.shadow
 import com.example.ontime.ui.theme.surfaceContainerLowest
@@ -70,12 +67,9 @@ fun AddFriendScreen(
         }
     }
 
-    // 성공 또는 에러 메시지를 보여주기 위한 상태
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            // 성공 시 다이얼로그 닫기
             showPhoneNumberDialog = false
-            // TODO: 성공 메시지 표시
         }
     }
 
@@ -87,9 +81,6 @@ fun AddFriendScreen(
     ) {
         AppBar()
 
-//        Button(onClick = { viewModel.addFriend(phoneNumber = phoneNumber) }) {
-//
-//        }
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center
@@ -259,14 +250,8 @@ private fun PhoneNumberInputDialog(
     currentPhoneNumber: String,
     onPhoneNumberChange: (String) -> Unit,
     onConfirm: () -> Unit,
-    phoneNumberError: String? = null  // 에러 메시지 파라미터 추가
+    phoneNumberError: String? = null
 ) {
-
-    // 전화번호 포맷 검증 함수
-    fun isValidPhoneNumber(number: String): Boolean {
-        return number.matches(Regex("^\\d{11}$"))  // 예: 01012345678
-    }
-
     val isValidNumber = currentPhoneNumber.length == 11
 
 
@@ -307,8 +292,8 @@ private fun PhoneNumberInputDialog(
                             focusedContainerColor = Color(0x1FE9E9E9),
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent,
-                            errorContainerColor = Color(0x1FE9E9E9),  // 에러 상태의 배경색
-                            errorIndicatorColor = Color.Red  // 에러 상태의 테두리 색
+                            errorContainerColor = Color(0x1FE9E9E9),
+                            errorIndicatorColor = Color.Red
                         ),
                         shape = RoundedCornerShape(5.dp),
                         modifier = Modifier
@@ -370,14 +355,5 @@ private fun PhoneNumberInputDialog(
             containerColor = surfaceContainerLowest,
             shape = RoundedCornerShape(8.dp)
         )
-    }
-}
-
-@Preview
-@Composable
-fun preview() {
-    val viewModel = TestViewModel()
-    OnTimeTheme {
-//        AddFriendScreen(onLogout = { /*TODO*/ })
     }
 }
