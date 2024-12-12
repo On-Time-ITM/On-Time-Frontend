@@ -35,16 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ontime.R
 import com.example.ontime.ui.theme.MainColor
-import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
     onSplashFinished: () -> Unit
 ) {
-    // 커스텀 폰트 정의
-    val warningFont = FontFamily(
-        Font(R.font.bebas_neue_regular)
-    )
     val warningFont2 = FontFamily(
         Font(R.font.roboto_bold)
     )
@@ -84,12 +79,12 @@ fun SplashScreen(
     // Animation sequence control
     LaunchedEffect(key1 = true) {
         startWarningAnimation = true
-        delay(2000)
+//        delay(2000)
         startWarningAnimation = false
-        delay(500)
+//        delay(500)
         showLogo = true
-        delay(2000)
-        onSplashFinished()
+//        delay(2000)
+        onSplashFinished() // 애니메이션이 끝나면 콜백 호출
     }
 
     Box(
