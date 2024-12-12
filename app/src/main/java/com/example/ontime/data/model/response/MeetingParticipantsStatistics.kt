@@ -1,8 +1,10 @@
 package com.example.ontime.data.model.response
 
 data class MeetingParticipantsStatistics(
-    val userId: String,
-    val statisticsInfo: StatisticsInfo
+    val id: String,
+    val name: String,
+    val phoneNumber: String,
+    val statistics: StatisticsInfo
 )
 
 data class StatisticsInfo(
