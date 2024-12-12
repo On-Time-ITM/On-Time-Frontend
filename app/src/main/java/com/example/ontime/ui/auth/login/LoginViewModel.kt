@@ -7,8 +7,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ontime.data.api.AuthApi
+import com.example.ontime.data.api.FcmApi
 import com.example.ontime.data.auth.AuthManager
+import com.example.ontime.data.model.request.FcmTokenRequest
 import com.example.ontime.data.model.request.LoginRequest
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authApi: AuthApi,
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val fcmApi: FcmApi
 ) : ViewModel() {
     var phoneNumber by mutableStateOf("")
         private set
@@ -49,7 +53,6 @@ class LoginViewModel @Inject constructor(
     // 로그인 상태 관리
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Initial)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
-
     private fun login(phoneNumber: String, password: String) {
         viewModelScope.launch {
             try {
@@ -58,8 +61,7 @@ class LoginViewModel @Inject constructor(
 
                 val request = LoginRequest(phoneNumber, password)
                 val response = authApi.login(request)
-                Log.d("ITM", "Request: ${request}") // 실제 전송되는 요청 데이터 확인
-
+                Log.d("ITM", "Login Request: $request")
 
                 if (response.isSuccessful) {
                     response.body()?.let { loginResponse ->
@@ -67,23 +69,61 @@ class LoginViewModel @Inject constructor(
                             userInfo = loginResponse.userInfo,
                             tokenInfo = loginResponse.tokenInfo
                         )
-                        Log.d("ITM", "$loginResponse")
+                        Log.d("ITM", "Login Response: $loginResponse")
+
+                        // FCM 토큰 전송 로직 시작
+                        Log.d("ITM", "Starting FCM token registration...")
+                        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                            Log.d("ITM", "FCM token task completed")
+                            if (task.isSuccessful) {
+                                val fcmToken = task.result
+                                Log.d("ITM", "Got FCM token: $fcmToken")
+                                val userId = authManager.getUserId()
+                                Log.d("ITM", "Current userId: $userId")
+
+                                viewModelScope.launch {
+                                    try {
+                                        val fcmRequest = FcmTokenRequest(userId!!, fcmToken)
+                                        Log.d("ITM", "Sending FCM token request: $fcmRequest")
+
+                                        val fcmResponse = fcmApi.saveToken(fcmRequest)
+                                        if (fcmResponse.isSuccessful) {
+                                            Log.d("ITM", "FCM token successfully sent to server")
+                                        } else {
+                                            Log.d(
+                                                "ITM",
+                                                "FCM token send failed: ${fcmResponse.code()}"
+                                            )
+                                            Log.d(
+                                                "ITM",
+                                                "Error body: ${fcmResponse.errorBody()?.string()}"
+                                            )
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.d("ITM", "Error sending FCM token", e)
+                                        e.printStackTrace()
+                                    }
+                                }
+                            } else {
+                                Log.d("ITM", "Failed to get FCM token", task.exception)
+                            }
+                        }
                     }
                     _loginState.value = LoginState.Success
                 } else {
                     _loginState.value = LoginState.Error("Login failed")
                     val errorBody = response.errorBody()?.string()
-                    Log.d("ITM", "Status Code: ${response.code()}")
-                    Log.d("ITM", "Error Body: $errorBody")
+                    Log.d("ITM", "Login Status Code: ${response.code()}")
+                    Log.d("ITM", "Login Error Body: $errorBody")
                 }
             } catch (e: Exception) {
                 _loginState.value = LoginState.Error(e.message ?: "Unknown error")
+                Log.d("ITM", "Login error", e)
             } finally {
                 isLoading = false
             }
         }
     }
-
 
     private fun validatePhoneNumber(phone: String): String? {
         return when {

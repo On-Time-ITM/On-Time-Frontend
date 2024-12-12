@@ -1,5 +1,6 @@
 package com.example.ontime.ui.auth.logout
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -27,30 +28,48 @@ class LogoutViewModel @Inject constructor(
     var isLoading by mutableStateOf(false)
         private set
 
+
     fun logout() {
         viewModelScope.launch {
-            try {
-                _logoutState.value = LogoutState.Loading
-                isLoading = true
-                val response = authApi.logout()
+            val userId = authManager.getUserId()
+            Log.d("ITM", "$userId")
+            // userId가 null이 아닌 경우에만 로그아웃 요청을 진행
+            if (userId != null) {
+                viewModelScope.launch {
+                    Log.d("ITM", "$userId")
 
-                if (response.isSuccessful) {
-                    authManager.clearAuthInfo()
-                    _logoutState.value = LogoutState.Success
-                } else {
-                    _logoutState.value = LogoutState.Error("Logout failed")
+                    try {
+                        _logoutState.value = LogoutState.Loading
+                        isLoading = true
+                        val response = authApi.logout(userId)
+                        Log.d(
+                            "ITM",
+                            "Logout Response Code: ${response.code()}"
+                        )
+                        if (response.isSuccessful) {
+                            authManager.clearAuthInfo()
+                            _logoutState.value = LogoutState.Success
+                            Log.d("ITM", "Logout Successful")
+                        } else {
+                            _logoutState.value = LogoutState.Error("Logout failed")
+                            Log.d(
+                                "ITM",
+                                "Logout Error Body: ${response.errorBody()?.string()}"
+                            )
+                        }
+                    } catch (e: Exception) {
+                        _logoutState.value = LogoutState.Error(e.message ?: "Unknown error")
+                    } finally {
+                        isLoading = false
+                    }
                 }
-            } catch (e: Exception) {
-                _logoutState.value = LogoutState.Error(e.message ?: "Unknown error")
-            } finally {
-                isLoading = false
+            } else {
+                // userId가 null일 경우 에러 처리
+                _logoutState.value = LogoutState.Error("User ID is required for logout")
             }
         }
     }
 
-    fun onLogoutClick() {
-        logout()
-    }
 }
 
 
