@@ -1,3 +1,5 @@
+package com.example.ontime.navigation
+
 // navigation/NavGraph.kt
 sealed class Screen(val route: String) {
     object Main : Screen("main")
@@ -9,5 +11,6 @@ sealed class Screen(val route: String) {
     object RequestList : Screen("requestList")
     object LocationSelection : Screen("LocationSelection")
     object Calendar : Screen("calendar")
+    object TeamDetail : Screen("teamDetail")
 }
 
