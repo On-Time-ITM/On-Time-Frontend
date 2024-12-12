@@ -48,7 +48,6 @@ import com.example.ontime.ui.theme.body_medium
 import com.example.ontime.ui.theme.shadow
 import com.example.ontime.ui.theme.surfaceContainerLowest
 
-
 @Composable
 fun AddFriendScreen(
     viewModel: AddFriendViewModel,
@@ -95,7 +94,7 @@ fun AddFriendScreen(
                 text = "Send Request",
                 onClick = { viewModel.addFriend(phoneNumber = uiState.phoneNumber) },
                 isLoading = uiState.isLoading,
-                enabled = uiState.phoneNumber.length == 11,
+                enabled = validatePhoneNumber(uiState.phoneNumber),
                 modifier = Modifier.padding(horizontal = 24.dp)
             )
             Spacer(modifier = modifier.height(100.dp))
@@ -243,6 +242,13 @@ private fun PhoneNumberCard(
     }
 }
 
+fun validatePhoneNumber(phone: String): Boolean {
+    return when {
+        phone.matches(Regex("^01[0-9]-\\d{4}-\\d{4}$")) -> true
+        else -> false
+    }
+}
+
 @Composable
 private fun PhoneNumberInputDialog(
     showDialog: Boolean,
@@ -252,8 +258,7 @@ private fun PhoneNumberInputDialog(
     onConfirm: () -> Unit,
     phoneNumberError: String? = null
 ) {
-    val isValidNumber = currentPhoneNumber.length == 11
-
+    val isValidNumber = validatePhoneNumber(currentPhoneNumber)
 
     if (showDialog) {
         AlertDialog(

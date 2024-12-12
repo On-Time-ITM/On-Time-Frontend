@@ -271,7 +271,9 @@ class TeamDetailViewModel @Inject constructor(
         uiState = uiState.copy(qrScanResult = null)
     }
 
-
+    //fun getTestTeamDetail() {
+//    view
+//}
     fun getTeamDetail() {
         viewModelScope.launch {
             try {

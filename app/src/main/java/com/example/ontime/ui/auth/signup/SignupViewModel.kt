@@ -58,6 +58,7 @@ class SignupViewModel @Inject constructor(
     }
 }
 
+
 // 회원가입 진행 상태를 나타내는 sealed class
 sealed class SignupState {
     object Initial : SignupState()

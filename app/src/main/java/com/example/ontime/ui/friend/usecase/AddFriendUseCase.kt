@@ -47,7 +47,8 @@ class AddFriendUseCase @Inject constructor(
         Log.d("ITM", "Validating phone number: $phone") // 전화번호 검증 로깅
         return when {
             phone.isEmpty() -> "Phone number is required"
-            !phone.matches(Regex("^\\d{11}$")) -> "Please enter a 11-digit phone number"
+//            !phone.matches(Regex("^\\d{11}$")) -> "Please enter a 11-digit phone number"
+            !phone.matches(Regex("^01[0-9]-\\d{4}-\\d{4}$")) -> "Please enter a 11-digit phone number"
             else -> null
         }
     }

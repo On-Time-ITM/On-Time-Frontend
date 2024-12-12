@@ -92,9 +92,8 @@ fun createColoredMarkerBitmap(color: Int): Bitmap {
     return bitmap
 }
 
-fun getRandomColor(): Int {
-    val random = java.util.Random()
-    return android.graphics.Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256))
+fun getMainColor(): Int {
+    return android.graphics.Color.rgb(255, 110, 112)
 }
 
 @Composable
@@ -238,15 +237,15 @@ fun TeamDetailScreen(
             Column {
                 AppBar()
 
-                Row {
-
-                    Button(onClick = { viewModel.getMeetingId() }) {
-                        Text(text = "meeting")
-                    }
-                    Button(onClick = { viewModel.getUserId() }) {
-                        Text(text = "user")
-                    }
-                }
+//                Row {
+//
+//                    Button(onClick = { viewModel.getMeetingId() }) {
+//                        Text(text = "meeting")
+//                    }
+//                    Button(onClick = { viewModel.getUserId() }) {
+//                        Text(text = "user")
+//                    }
+//                }
 
                 Column(
                     modifier = Modifier
@@ -560,7 +559,7 @@ fun ArrivedButton(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (isArrived) "QR코드 보기" else "QR코드로 체크인",
+                    text = if (isArrived) "QR code" else "Check in with QR code",
                     fontSize = 18.sp
                 )
             }
@@ -581,9 +580,9 @@ fun ArrivedButton(
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = if (isArrived)
-                    "또는 휴대폰을 흔들어서 QR코드 보기"
+                    "Or shake your phone to view the QR code"
                 else
-                    "또는 휴대폰을 흔들어서 체크인",
+                    "Or shake your phone to check in",
                 fontSize = 12.sp,
                 color = SubColor
             )
@@ -633,7 +632,7 @@ private fun TeamLocationMap(
             // 참가자 마커
             participantLocations.forEach { (_, locationInfo) ->
                 if (locationInfo != null && locationInfo.participantLocation != null) {
-                    val randomColor = getRandomColor()
+                    val randomColor = getMainColor()
                     val markerBitmap = createColoredMarkerBitmap(randomColor)
 
                     val latitude = locationInfo.participantLocation.latitude

@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -168,9 +167,9 @@ fun TeamFormationScreen(
                         .background(surfaceContainerLowest)
                 ) {
 
-                    Button(onClick = { viewModel.getValue() }) {
-
-                    }
+//                    Button(onClick = { viewModel.getValue() }) {
+//
+//                    }
                     AppBar()
 
                     Text(

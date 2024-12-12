@@ -3,6 +3,7 @@ package com.example.ontime.ui.friend.contactList
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.ContactsContract
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -69,7 +70,9 @@ class ContactListViewModel @Inject constructor(
                         val phoneNumber = it.getString(1)
                         contacts.add(Contact(name, phoneNumber))
                     }
+                    Log.d("ContactsDebug", "Fetched contacts: $contacts")
                 }
+                Log.d("ITM", "$contacts")
 
                 uiState = uiState.copy(
                     contacts = contacts,

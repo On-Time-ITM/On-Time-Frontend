@@ -42,6 +42,16 @@ import com.example.ontime.ui.theme.onSurfaceVariant
 import com.example.ontime.ui.theme.surfaceContainerLowest
 import dagger.hilt.android.AndroidEntryPoint
 
+
+fun validatePhoneNumber(phone: String): String? {
+    return when {
+        phone.isEmpty() -> "Phone number is required"
+//            !phone.matches(Regex("^\\d{10,11}$")) -> "Invalid phone number format"
+        !phone.matches(Regex("^01[0-9]-\\d{4}-\\d{4}$")) -> "Invalid phone number format"
+        else -> null
+    }
+}
+
 @AndroidEntryPoint
 class SignupActivity : ComponentActivity() {
     private val viewModel: SignupViewModel by viewModels()
@@ -160,7 +170,7 @@ fun SignUp(viewModel: SignupViewModel) {
             value = phone,
             onValueChange = {
                 phone = it
-                phoneError = null
+                phoneError = validatePhoneNumber(it)
             },
             label = "Phone Number",
             error = phoneError,

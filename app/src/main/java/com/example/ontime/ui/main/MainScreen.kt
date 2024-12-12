@@ -26,7 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -138,14 +137,14 @@ fun MainScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             AppBar()
-            Row {
-                Button(onClick = { Log.d("ITM", "${viewModel.userId}") }) {
-                    Text(text = "userId")
-                }
-                Button(onClick = { viewModel.logout() }) {
-                    Text("Logout")
-                }
-            }
+//            Row {
+//                Button(onClick = { Log.d("ITM", "${viewModel.userId}") }) {
+//                    Text(text = "userId")
+//                }
+//                Button(onClick = { viewModel.logout() }) {
+//                    Text("Logout")
+//                }
+//            }
             UserStatsCard(userName = userName, tardinessRate = tardinessRate)
 
             // Meeting List Section
@@ -338,11 +337,11 @@ private fun TeamCard(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    "${meeting.participantCount}명",
-                    fontSize = body_large,
-                    color = shadow
-                )
+//                Text(
+//                    "${meeting.participantCount}명",
+//                    fontSize = body_large,
+//                    color = shadow
+//                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -578,7 +577,7 @@ private fun TeamListContent(
                 showDeleteDialog = false
                 meetingToDelete = null
             },
-            title = "팀 삭제",
+            title = "Delete team",
             onConfirm = {
                 meetingToDelete?.let { meeting ->
                     viewModel.deleteMeeting(meeting.id)
@@ -591,12 +590,12 @@ private fun TeamListContent(
                 modifier = Modifier.padding(vertical = 16.dp)
             ) {
                 Text(
-                    "정말 이 팀을 삭제하시겠습니까?",
+                    "Are you sure you want to delete this team??",
                     fontSize = body_large,
                     color = shadow
                 )
                 Text(
-                    "이 작업은 되돌릴 수 없습니다.",
+                    "This action cannot be undone.",
                     fontSize = body_medium,
                     color = SubColor,
                     modifier = Modifier.padding(top = 8.dp)

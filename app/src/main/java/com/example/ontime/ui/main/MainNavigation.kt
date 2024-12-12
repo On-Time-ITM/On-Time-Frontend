@@ -1,12 +1,19 @@
 package com.example.ontime.ui.main
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -173,6 +180,31 @@ private fun NavGraphBuilder.mainScreen(navController: NavController, context: Co
         val logoutViewModel: LogoutViewModel = hiltViewModel()
         val viewModel: MainViewModel = hiltViewModel()
         val logoutState by logoutViewModel.logoutState.collectAsState()
+
+        // 알림 권한 요청을 위한 launcher 설정
+        val notificationPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                Log.d("ITM", "알림 권한이 승인되었습니다")
+            } else {
+                Log.d("ITM", "알림 권한이 거부되었습니다")
+            }
+        }
+
+        // 알림 권한 체크 및 요청
+        LaunchedEffect(Unit) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val hasPermission = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (!hasPermission) {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
 
         // 로그아웃 상태 처리
         LaunchedEffect(logoutState) {

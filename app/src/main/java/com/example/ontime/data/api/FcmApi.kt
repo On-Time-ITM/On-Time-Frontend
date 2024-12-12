@@ -9,4 +9,5 @@ import retrofit2.http.POST
 interface FcmApi {
     @POST("/api/v1/messages/token")
     suspend fun saveToken(@Body request: FcmTokenRequest): Response<Unit>
+
 }
