@@ -13,31 +13,32 @@ class AddFriendUseCase @Inject constructor(
     suspend fun addFriend(phoneNumber: String): Result<Unit> {
         return try {
             val userId = authManager.getUserId()
-            val request =
-                AddFriendRequest(requesterId = userId.toString(), receiverPhoneNumber = phoneNumber)
-            Log.d("ITM", "Request: $request") // 요청 데이터 로깅
+            val request = AddFriendRequest(
+                requesterId = userId.toString(),
+                receiverPhoneNumber = phoneNumber
+            )
+            Log.d("ITM", "Request: $request")
 
             val response = friendApi.addFriend(request)
 
             if (response.isSuccessful) {
-                response.body()?.let { responseBody ->
-                    Log.d("ITM", "Response: $responseBody") // 성공 응답 로깅
-                }
+
+
                 Result.success(Unit)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val errorMessage = when (response.code()) {
                     400 -> "Invalid request or self-friend request"
-                    404 -> "User not found" // A005
-                    409 -> "Duplicate friend request" // F002
+                    404 -> "User not found"
+                    409 -> "Duplicate friend request"
                     else -> "Unknown error occurred"
                 }
-                Log.d("ITM", "Status Code: ${response.code()}") // 에러 상태 코드 로깅
-                Log.d("ITM", "Error Body: $errorBody") // 에러 응답 로깅
+                Log.d("ITM", "Status Code: ${response.code()}")
+                Log.d("ITM", "Error Body: $errorBody")
                 Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
-            Log.e("ITM", "Exception occurred", e) // 예외 로깅
+            Log.e("ITM", "Exception occurred", e)
             Result.failure(e)
         }
     }
