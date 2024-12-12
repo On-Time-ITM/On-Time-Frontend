@@ -3,7 +3,9 @@ package com.example.ontime.di
 import android.content.Context
 import com.example.ontime.data.api.ApiClient
 import com.example.ontime.data.api.AuthApi
+import com.example.ontime.data.api.FcmApi
 import com.example.ontime.data.api.FriendApi
+import com.example.ontime.data.api.MeetingApi
 import com.example.ontime.data.api.NominatimApi
 import com.example.ontime.data.auth.AuthManager
 import com.example.ontime.ui.friend.usecase.AddFriendUseCase
@@ -34,8 +36,21 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideMeetingApi(apiClient: ApiClient): MeetingApi {
+        return apiClient.meetingApi
+    }
+
+
+    @Provides
+    @Singleton
     fun provideAuthApi(apiClient: ApiClient): AuthApi {
         return apiClient.authApi
+    }
+
+    @Provides
+    @Singleton
+    fun provideFcmApi(apiClient: ApiClient): FcmApi {
+        return apiClient.fcmApi
     }
 
     @Provides

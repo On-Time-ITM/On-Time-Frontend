@@ -46,9 +46,8 @@ class ApiClient @Inject constructor() {
 
     val authApi: AuthApi = retrofit.create(AuthApi::class.java)
     val friendApi: FriendApi = retrofit.create(FriendApi::class.java)
-
-
-//    private val NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/"
+    val meetingApi: MeetingApi = retrofit.create(MeetingApi::class.java)
+    val fcmApi: FcmApi = retrofit.create(FcmApi::class.java)
 
 
     private val nominatimRetrofit = Retrofit.Builder()
@@ -72,9 +71,31 @@ class ApiClient @Inject constructor() {
             .build()
     }
 
+
+    private val STABILITY_API_KEY =
+        "sk-lqKysyUKs0KibwjhkjMVeIiteSsPl3yc5AUxBj5pdVO23pUb" // TODO: API 키
+
+    private val stabilityOkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header("Authorization", "Bearer $STABILITY_API_KEY")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+    private val stabilityRetrofit = Retrofit.Builder()
+        .baseUrl(STABILITY_BASE_URL)
+        .client(stabilityOkHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    val stabilityApi: StabilityApi = stabilityRetrofit.create(StabilityApi::class.java)
+
     companion object {
         private const val BASE_URL = "http://10.0.2.2:8080"
         private const val NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/"
+        private const val STABILITY_BASE_URL = "https://api.stability.ai/"
     }
 
 }
