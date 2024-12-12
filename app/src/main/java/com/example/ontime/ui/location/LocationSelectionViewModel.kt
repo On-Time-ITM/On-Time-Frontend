@@ -62,10 +62,6 @@ class LocationSelectionViewModel @Inject constructor(
     }
 
 
-    // 위치가 선택되었을 때의 콜백을 위한 이벤트
-    private val _navigationEvent = MutableSharedFlow<LocationSelectionEvent>()
-    val navigationEvent = _navigationEvent.asSharedFlow()
-
     fun onSearchChange(newText: String) {
         uiState = uiState.copy(searchText = newText)
         searchWithDebounce(newText)
@@ -113,33 +109,6 @@ class LocationSelectionViewModel @Inject constructor(
             }
         }
     }
-//
-//    // 위치 선택 완료 처리
-//    fun confirmLocation() {
-//        viewModelScope.launch {
-//            try {
-//                uiState.selectedLocation?.let { location ->
-//                    uiState = uiState.copy(isLoading = true)
-//                    val address = locationRepository.reverseGeocode(location)
-//
-//                    _navigationEvent.emit(
-//                        LocationSelectionEvent.LocationConfirmed(
-//                            address = address,
-//                            latLng = location
-//                        )
-//                    )
-//
-//                    uiState = uiState.copy(isLoading = false)
-//                }
-//            } catch (e: Exception) {
-//                Log.e("ITM", "Error: ${e.message}", e)
-//                uiState = uiState.copy(
-//                    error = "Failed to confirm location: ${e.message}",
-//                    isLoading = false
-//                )
-//            }
-//        }
-//    }
 
     fun searchLocations() {
         if (uiState.searchText.isBlank()) return
@@ -190,6 +159,11 @@ class LocationSelectionViewModel @Inject constructor(
         )
     }
 
+
+    // 위치가 선택되었을 때의 콜백을 위한 이벤트
+    private val _navigationEvent = MutableSharedFlow<LocationSelectionEvent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
     fun confirmLocation() {
         viewModelScope.launch {
             try {
@@ -208,6 +182,7 @@ class LocationSelectionViewModel @Inject constructor(
                         _navigationEvent.emit(
                             LocationSelectionEvent.LocationConfirmed(
                                 address = address,
+//                                address = "프티",
                                 latLng = selection.latLng
                             )
                         )
@@ -237,27 +212,4 @@ class LocationSelectionViewModel @Inject constructor(
             val latLng: LatLng
         ) : LocationSelection()
     }
-//    init {
-//        viewModelScope.launch {
-//            searchText
-//                .debounce(300L)  // 타이핑 중에는 API 호출 안함
-//                .collect { query ->
-//                    if (query.length >= 2) {
-//                        searchLocation(query)
-//                    }
-//                }
-//        }
-//    }
-
-//    private suspend fun searchLocation(query: String) {
-//        _isLoading.value = true
-//        try {
-//            val results = locationRepository.search(query)
-//            _searchResults.value = results
-//        } catch (e: Exception) {
-//            // 에러 처리
-//        } finally {
-//            _isLoading.value = false
-//        }
-//    }
 }
