@@ -1,6 +1,6 @@
 package com.example.ontime.data.model.response
 
-import com.example.ontime.data.model.request.AccountInfoRequest
+import com.example.ontime.data.model.request.AccountInfo
 
 data class MeetingResponse(
     val id: String,
@@ -8,7 +8,7 @@ data class MeetingResponse(
     val meetingDateTime: String,
     val location: Location,
     val lateFee: Int,
-    val accountInfo: AccountInfoRequest,
+    val accountInfo: AccountInfo,
     val profileImage: String,
     val participantCount: Int
 )
