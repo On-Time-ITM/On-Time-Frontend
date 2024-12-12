@@ -60,8 +60,7 @@ fun SearchBar(
     searchResults: List<SearchResult>,
     onSearchChange: (String) -> Unit,
     onSearch: () -> Unit,
-    onResultSelect: (SearchResult) -> Unit,
-    modifier: Modifier = Modifier
+    onResultSelect: (SearchResult) -> Unit
 ) {
     Column {  // Column으로 감싸서 검색창과 결과를 수직으로 배치
         Row(
@@ -189,7 +188,7 @@ fun LocationSelectionScreen(
             )
         }
     }
-    
+
     // 현재 위치가 업데이트되면 카메라 이동
     LaunchedEffect(uiState.currentLocation) {
         uiState.currentLocation?.let { location ->
