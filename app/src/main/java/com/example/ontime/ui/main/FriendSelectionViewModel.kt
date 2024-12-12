@@ -37,7 +37,7 @@ class FriendSelectionViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 uiState = uiState.copy(isLoading = true)
-                val response = friendApi.getFriends(userId = userId.toString())
+                val response = friendApi.getFriendList(userId = userId.toString())
                 if (response.isSuccessful) {
                     response.body()?.let { responseBody ->
                         Log.d("ITM", "${responseBody}")
@@ -67,4 +67,6 @@ class FriendSelectionViewModel @Inject constructor(
             }
         }
     }
+
+
 }
